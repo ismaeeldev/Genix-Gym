@@ -14,6 +14,8 @@ Coded by www.creative-tim.com
 */
 
 import { useEffect } from "react";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 // react-router-dom components
 import { useLocation, NavLink } from "react-router-dom";
@@ -52,6 +54,15 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
   const location = useLocation();
   const collapseName = location.pathname.replace("/", "");
+  const navigate = useNavigate();
+
+  //logout function 
+
+  const onLogout = () => {
+    Cookies.remove("jwtToken");
+    navigate("/authentication/sign-in");
+  }
+
 
   let textColor = "white";
 
@@ -182,17 +193,17 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
       <MDBox p={2} mt="auto">
         <MDButton
           component="a"
-          href="https://www.creative-tim.com/product/material-dashboard-pro-react"
           target="_blank"
           rel="noreferrer"
           variant="gradient"
           color={sidenavColor}
           fullWidth
+          onClick={onLogout}
         >
-          upgrade to pro
+          Logout
         </MDButton>
       </MDBox>
-    </SidenavRoot>
+    </SidenavRoot >
   );
 }
 

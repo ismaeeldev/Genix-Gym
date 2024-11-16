@@ -36,6 +36,8 @@ import DefaultNavbarMobile from "examples/Navbars/DefaultNavbar/DefaultNavbarMob
 
 // Material Dashboard 2 React base styles
 import breakpoints from "assets/theme/base/breakpoints";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 // Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
@@ -43,6 +45,8 @@ import { useMaterialUIController } from "context";
 function DefaultNavbar({ transparent, light, action }) {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
+  const navigate = useNavigate();
+
 
   const [mobileNavbar, setMobileNavbar] = useState(false);
   const [mobileView, setMobileView] = useState(false);
@@ -74,6 +78,11 @@ function DefaultNavbar({ transparent, light, action }) {
     // Remove event listener on cleanup
     return () => window.removeEventListener("resize", displayMobileNavbar);
   }, []);
+
+  const onLogout = () => {
+    Cookies.remove("jwtToken");
+    navigate("/authentication/sign-in");
+  }
 
   return (
     <Container>
@@ -109,23 +118,23 @@ function DefaultNavbar({ transparent, light, action }) {
           lineHeight={1}
           pl={{ xs: 0, lg: 1 }}
         >
-          <MDTypography variant="button" fontWeight="bold" color={light ? "white" : "dark"}>
-            Material Dashboard 2
+          <MDTypography fontSize="20px" variant="button" fontWeight="bold" color={light ? "white" : "dark"}>
+            Genix Gym
           </MDTypography>
         </MDBox>
         <MDBox color="inherit" display={{ xs: "none", lg: "flex" }} m={0} p={0}>
           <DefaultNavbarLink icon="donut_large" name="dashboard" route="/dashboard" light={light} />
           <DefaultNavbarLink icon="person" name="profile" route="/profile" light={light} />
           <DefaultNavbarLink
-            icon="account_circle"
-            name="sign up"
-            route="/authentication/sign-up"
+            icon="table_view"
+            name="tables"
+            route="/tables"
             light={light}
           />
           <DefaultNavbarLink
             icon="key"
-            name="sign in"
-            route="/authentication/sign-in"
+            name="Admin"
+            route="/"
             light={light}
           />
         </MDBox>
@@ -146,15 +155,15 @@ function DefaultNavbar({ transparent, light, action }) {
             <MDBox display={{ xs: "none", lg: "inline-block" }}>
               <MDButton
                 component="a"
-                href={action.route}
                 target="_blank"
                 rel="noreferrer"
                 variant="gradient"
                 color={action.color ? action.color : "info"}
-                size="small"
+                size="medium"
                 sx={{ mt: -0.3 }}
+                onClick={onLogout}
               >
-                {action.label}
+                Logout
               </MDButton>
             </MDBox>
           ))}
