@@ -44,6 +44,7 @@ import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
+import Register from "layouts/register"
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -75,11 +76,11 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "RTL",
-    key: "rtl",
-    icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
-    route: "/rtl",
-    component: <RTL />,
+    name: "Registeration",
+    key: "register",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/register",
+    component: <Register />,
   },
   {
     type: "collapse",

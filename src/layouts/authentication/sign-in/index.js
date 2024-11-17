@@ -1,26 +1,23 @@
 import { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import Switch from "@mui/material/Switch";
 import Grid from "@mui/material/Grid";
 import MuiLink from "@mui/material/Link";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import GitHubIcon from "@mui/icons-material/GitHub";
-import GoogleIcon from "@mui/icons-material/Google";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-register-2.jpg";
-import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 
 function Basic() {
   const navigate = useNavigate();
   const [rememberMe, setRememberMe] = useState(false);
-  const [username, setusername] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
 
   // Toggle the remember me switch
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
@@ -44,47 +41,25 @@ function Basic() {
         body: JSON.stringify({ username, password }),
       });
 
-      // Handle different status codes
+      // Check if the response is OK (status 200)
       if (response.ok) {
-        // This handles status codes in the range 200-299
-        const data = await response.json(); // Assume the token is in the response body
+        const data = await response.json();
         const token = data.jwtToken;
 
         if (token) {
-          const modifiedToken = token.substring(7);
-
-          // if (typeof window !== "undefined") {
-          //   Cookies.set("jwtToken", modifiedToken, {
-          //     path: "/", // Cookie accessible throughout the app
-          //     expires: 7, // Expires in 7 days
-          //   });
-          // }
-
+          const modifiedToken = token.substring(7); // Remove "Bearer " prefix
           Cookies.set("jwtToken", modifiedToken, { expires: 7 });
-
           alert("Login successful! Token saved in the cookie.");
           navigate("/dashboard");
         } else {
           throw new Error("JWT Token not found in response body.");
         }
       } else {
-        // If the response is not ok (e.g., 4xx or 5xx)
+        // Handle errors based on the API response
         const errorData = await response.json();
-
-        // Handle specific error codes
-        switch (response.status) {
-          case 400:
-            throw new Error("Bad Request: Please check the username and password.");
-          case 401:
-            throw new Error("Unauthorized: Invalid username or password.");
-          case 500:
-            throw new Error("Server Error: Something went wrong on the server.");
-          default:
-            throw new Error(errorData.message || "Login failed! Please try again.");
-        }
+        alert(`Error: ${errorData.message || "Login failed! Please try again."}`);
       }
     } catch (error) {
-      // Log the error to the console for debugging
       console.error("Error during login:", error);
       alert(`Error: ${error.message}`);
     }
@@ -107,17 +82,16 @@ function Basic() {
           <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
             Sign in
           </MDTypography>
-
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={onChangeLogin}>
             <MDBox mb={2}>
               <MDInput
                 type="text"
-                label="username"
+                label="Username"
                 fullWidth
                 value={username}
-                onChange={(e) => setusername(e.target.value)}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </MDBox>
             <MDBox mb={2}>
@@ -128,6 +102,7 @@ function Basic() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+
             </MDBox>
             <MDBox display="flex" alignItems="center" ml={-1}>
               <Switch checked={rememberMe} onChange={handleSetRememberMe} />
@@ -148,10 +123,9 @@ function Basic() {
             </MDBox>
             <MDBox mt={3} mb={1} textAlign="center">
               <MDTypography variant="button" color="text">
-                Don&apos;t have an account?{" "}
+                For Any Query{" "}
                 <MDTypography
                   component={Link}
-                  to="/authentication/sign-up"
                   variant="button"
                   color="info"
                   fontWeight="medium"

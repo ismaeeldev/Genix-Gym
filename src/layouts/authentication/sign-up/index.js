@@ -57,7 +57,7 @@ function Cover() {
     });
   };
 
- 
+
 
   const { Daily, Monthly, Yearly } = state;
 
