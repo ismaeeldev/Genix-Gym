@@ -68,6 +68,7 @@ function Dashboard() {
         const responseData = await response.text(); // Get the error response as text
         alert("Error: " + responseData);
         navigate("/authentication/sign-in");
+        Cookies.remove("jwtToken");
 
         return;
       }
