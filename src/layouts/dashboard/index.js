@@ -66,8 +66,9 @@ function Dashboard() {
       // Check if the response is OK (status 200-299)
       if (!response.ok) {
         const responseData = await response.text(); // Get the error response as text
-        console.error('Error response:', responseData);
         alert("Error: " + responseData);
+        navigate("/authentication/sign-in");
+
         return;
       }
 
