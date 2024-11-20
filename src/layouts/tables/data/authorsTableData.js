@@ -97,7 +97,7 @@ export default function data() {
     return date.toLocaleDateString('en-US', options);
   }
 
-  // Dynamically generate rows for the DataTable
+  // Dynamically generate rows for the DataTable, 
   const rows = userData.map((user) => ({
     author: <Author name={user.name} />,
     phone: <Phone phone={user.phone} />,
@@ -110,8 +110,8 @@ export default function data() {
           variant="gradient"
           size="sm"
         />
-      </MDBox>
-    ),
+      </MDBox>     
+    ), 
     joiningDate: (
       <MDTypography
         component="a"
