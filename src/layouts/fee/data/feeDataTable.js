@@ -4,8 +4,9 @@ import MDTypography from "components/MDTypography";
 import MDBadge from "components/MDBadge";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
-import UpdateModal from "components/Modal/UserModal";
+import UpdateModal from "components/Modal/FeeModal";
 import { debounce } from "lodash";
+import UserReport from 'components/Report'
 
 
 // Define the Author component
@@ -63,6 +64,13 @@ export default function data(searchForm) {
   const [totalPage, setTotalPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
+  const [isHistory, setHistory] = useState(false);
+
+
+
+  const handleHistory = () => {
+    setHistory(true);
+  }
 
 
   const handlePage = (event, value) => {
@@ -182,13 +190,13 @@ export default function data(searchForm) {
       <MDBox display="flex" justifyContent="space-around">
         <button
           onClick={() => {
-            console.log("Edit clicked");
+            console.log("Edit clicked of fee");
             handleOpen(user);
           }}
           style={{ background: "transparent", border: "none", cursor: "pointer" }}
         >
           <MDTypography variant="caption" color="text" fontWeight="medium">
-            Edit
+            Pay Fee
           </MDTypography>
         </button>
         <UpdateModal open={open} onClose={handleClose} user={selectedUser} />
@@ -197,15 +205,15 @@ export default function data(searchForm) {
 
         &nbsp; &nbsp; &nbsp;
         <button
-          onClick={() => {
-
-          }}
+          onClick={handleHistory}
           style={{ background: "transparent", border: "none", cursor: "pointer" }}
         >
           <MDTypography variant="caption" color="text" fontWeight="medium">
-            view
+            History
           </MDTypography>
         </button>
+
+        {/* {isHistory && <UserReport user={user} />} */}
       </MDBox>
     ),
   }));

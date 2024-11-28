@@ -16,14 +16,13 @@ import DataTable from "examples/Tables/DataTable";
 import Footer from "examples/Footer";
 import MDButton from "components/MDButton";
 // Data
-import authorsTableData from "layouts/tables/data/authorsTableData";
-import projectsTableData from "layouts/tables/data/projectsTableData";
+import feeDataTable from "layouts/fee/data/feeDataTable";
 import { Pagination } from "@mui/material";
 import PropTypes from "prop-types"; // Import PropTypes for validation
 
 
 
-function UserTable() {
+function FeeTable() {
 
   const [searchForm, setSearchForm] = useState({
     name: "",
@@ -63,7 +62,7 @@ function UserTable() {
 
 
 
-  const { columns, rows, handlePages, totalPage } = authorsTableData(searchForm);
+  const { columns, rows, handlePages, totalPage } = feeDataTable(searchForm);
 
 
 
@@ -299,5 +298,9 @@ function UserTable() {
   );
 }
 
-export default UserTable;
+
+
+
+
+export default FeeTable;
 

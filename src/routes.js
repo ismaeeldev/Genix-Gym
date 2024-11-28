@@ -37,7 +37,6 @@ Coded by www.creative-tim.com
 
 // Material Dashboard 2 React layouts
 import Dashboard from "layouts/dashboard";
-import Tables from "layouts/tables";
 import Billing from "layouts/billing";
 import RTL from "layouts/rtl";
 import Notifications from "layouts/notifications";
@@ -45,6 +44,11 @@ import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import Register from "layouts/register"
+import UserTable from 'layouts/tables'
+import FeeTable from 'layouts/fee'
+import Report from 'components/Report'
+
+
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -60,11 +64,19 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Tables",
+    name: "Member Data",
     key: "tables",
     icon: <Icon fontSize="small">table_view</Icon>,
     route: "/tables",
-    component: <Tables />,
+    component: <UserTable />,
+  },
+  {
+    type: "collapse",
+    name: "Fee Management",
+    key: "fee-management",
+    icon: <Icon fontSize="small">receipt_long</Icon>,
+    route: "/fee-management",
+    component: <FeeTable />,
   },
   {
     type: "collapse",
@@ -112,7 +124,7 @@ const routes = [
     key: "sign-up",
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/authentication/sign-up",
-    component: <SignUp />,
+    component: <Report />,
   },
 ];
 
