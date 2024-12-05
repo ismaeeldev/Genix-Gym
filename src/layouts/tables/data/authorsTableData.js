@@ -78,6 +78,7 @@ export default function data(searchForm) {
 
   const handleClose = () => {
     setOpen(false);
+    fetchUserData();
   }
 
 
@@ -175,7 +176,7 @@ export default function data(searchForm) {
         color="text"
         fontWeight="medium"
       >
-        {formatDateOnly(user.registration_date)}
+        {formatDateOnly(user.registrationDate)}
       </MDTypography>
     ),
     action: (

@@ -47,6 +47,7 @@ import Register from "layouts/register"
 import UserTable from 'layouts/tables'
 import FeeTable from 'layouts/fee'
 import Report from 'components/Report'
+import Loader from "components/Loader"
 
 
 
@@ -88,11 +89,12 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Registeration",
-    key: "register",
+    name: "Registration",
+    key: "registration",
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/register",
     component: <Register />,
+
   },
   {
     type: "collapse",
@@ -119,12 +121,13 @@ const routes = [
     component: <SignIn />,
   },
   {
-    type: "collapse",
-    name: "Register",
-    key: "sign-up",
-    icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/authentication/sign-up",
+    route: "/payment-history",
     component: <Report />,
+  },
+
+  {
+    route: "/Loader",
+    component: <Loader />,
   },
 ];
 

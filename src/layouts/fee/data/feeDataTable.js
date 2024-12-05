@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 import UpdateModal from "components/Modal/FeeModal";
 import { debounce } from "lodash";
 import UserReport from 'components/Report'
+import { useNavigate } from "react-router-dom";
 
 
 // Define the Author component
@@ -65,11 +66,12 @@ export default function data(searchForm) {
   const [open, setOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
   const [isHistory, setHistory] = useState(false);
+  const navigate = useNavigate();
 
 
 
-  const handleHistory = () => {
-    setHistory(true);
+  const handleHistory = (user) => {
+    navigate('/payment-history', { state: { user } })
   }
 
 
@@ -86,6 +88,7 @@ export default function data(searchForm) {
 
   const handleClose = () => {
     setOpen(false);
+    fetchUserData();
   }
 
 
@@ -183,7 +186,7 @@ export default function data(searchForm) {
         color="text"
         fontWeight="medium"
       >
-        {formatDateOnly(user.registration_date)}
+        {formatDateOnly(user.registrationDate)}
       </MDTypography>
     ),
     action: (
@@ -205,7 +208,7 @@ export default function data(searchForm) {
 
         &nbsp; &nbsp; &nbsp;
         <button
-          onClick={handleHistory}
+          onClick={() => { handleHistory(user) }}
           style={{ background: "transparent", border: "none", cursor: "pointer" }}
         >
           <MDTypography variant="caption" color="text" fontWeight="medium">
@@ -213,7 +216,6 @@ export default function data(searchForm) {
           </MDTypography>
         </button>
 
-        {/* {isHistory && <UserReport user={user} />} */}
       </MDBox>
     ),
   }));

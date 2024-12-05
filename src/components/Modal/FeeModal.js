@@ -228,6 +228,7 @@ const UpdateModal = ({ open, onClose, user }) => {
 
 
                     <Box sx={{ display: "flex", alignItems: "flex-end", mb: 2 }}>
+                        <FiUser style={{ marginRight: "8px" }} />
                         <Select
                             onChange={handleChange("membership_type")}
                             value={feeData.membership_type}

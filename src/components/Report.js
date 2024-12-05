@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Box,
     Card,
@@ -19,6 +19,10 @@ import {
 import { styled } from "@mui/system";
 import { FiUser, FiMail, FiPhone, FiCreditCard } from "react-icons/fi";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
+import Cookies from "js-cookie";
+import { useLocation } from 'react-router-dom';
+
+
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
     "&:nth-of-type(odd)": {
@@ -30,46 +34,58 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     },
 }));
 
-const UserReport = (userData) => {
-    const theme = useTheme();
-    // const [userData] = useState({
-    //     name: "John Doe",
-    //     email: "john.doe@example.com",
-    //     phone: "+1 234 567 8900",
-    //     membership_type: "Premium",
-    //     profileImage: "images.unsplash.com/photo-1633332755192-727a05c4013d?w=150",
-    // });
+const UserReport = (id) => {
 
-    const [paymentHistory] = useState([
-        {
-            id: 1,
-            date: "2024-01-15",
-            amount: 99.99,
-            method: "Credit Card",
-            status: "Paid",
-        },
-        {
-            id: 2,
-            date: "2023-12-15",
-            amount: 99.99,
-            method: "Credit Card",
-            status: "Paid",
-        },
-        {
-            id: 3,
-            date: "2023-11-15",
-            amount: 99.99,
-            method: "PayPal",
-            status: "Paid",
-        },
-        {
-            id: 4,
-            date: "2023-10-15",
-            amount: 99.99,
-            method: "Credit Card",
-            status: "Pending",
-        },
-    ]);
+    const jwtToken = Cookies.get("jwtToken");
+    const location = useLocation();
+    const theme = useTheme();
+    const [userData, setUserData] = useState({});
+    const [paymentHistory, setPaymentHistory] = useState([]);
+    const { user } = location.state || {};
+
+
+
+    useEffect(() => {
+
+        console.log(user);
+
+        setUserData({
+            name: user?.name,
+            email: user?.email,
+            phone: user?.phone,
+            membership_type: user?.membership_type,
+        });
+
+
+        const fetchData = async () => {
+            try {
+                const response = await fetch(`http://localhost:8080/api/member/history/${user.id}`, {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                const data = await response.json();
+
+                // Update payment history
+                setPaymentHistory(data.map(payment => ({
+                    id: payment.id,
+                    date: new Date(payment.paymentDate).toLocaleDateString(),  // Ensure valid date format
+                    amount: payment.amountPaid,   // Verify this field exists
+                    method: payment.paymentMethod || 'N/A',  // Check for undefined fields
+                    status: payment.feeStatus,   // Ensure status is provided
+                })));
+
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, [user, id, jwtToken]);
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -140,60 +156,67 @@ const UserReport = (userData) => {
                     </Grid>
 
                     <Grid item xs={12}>
-                        <Paper
-                            elevation={3}
-                            sx={{
-                                borderRadius: 2,
-                                overflow: "hidden",
-                                bgcolor: theme.palette.mode === "dark" ? "#1e1e1e" : "background.paper",
-                            }}
-                            aria-label="Payment history section"
-                        >
-                            <Typography
-                                variant="h6"
+                        {paymentHistory.length > 0 ? (
+                            <Paper
+                                elevation={3}
                                 sx={{
-                                    p: 2,
-                                    bgcolor: theme.palette.mode === "dark" ? "#2a2a2a" : "#f5f5f5",
-                                    color: "text.primary"
+                                    borderRadius: 2,
+                                    overflow: "hidden",
+                                    bgcolor: theme.palette.mode === "dark" ? "#1e1e1e" : "background.paper",
                                 }}
+                                aria-label="Payment history section"
                             >
-                                Payment History
+                                <Typography
+                                    variant="h6"
+                                    sx={{
+                                        p: 2,
+                                        bgcolor: theme.palette.mode === "dark" ? "#2a2a2a" : "#f5f5f5",
+                                        color: "text.primary"
+                                    }}
+                                >
+                                    Payment History
+                                </Typography>
+                                <TableContainer>
+                                    <Table aria-label="payment history table">
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell sx={{ color: "text.primary" }}>Date</TableCell>
+                                                <TableCell sx={{ color: "text.primary" }}>Amount</TableCell>
+                                                <TableCell sx={{ color: "text.primary" }}>Payment Method</TableCell>
+                                                <TableCell sx={{ color: "text.primary" }}>Status</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {paymentHistory.map((payment) => (
+                                                <StyledTableRow key={payment.id}>
+                                                    <TableCell sx={{ color: "text.secondary" }}>{payment.date}</TableCell>
+                                                    <TableCell sx={{ color: "text.secondary" }}>RS {payment.amount.toFixed(2)}</TableCell>
+                                                    <TableCell sx={{ color: "text.secondary" }}>
+                                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                                            <FiCreditCard color={theme.palette.text.primary} />
+                                                            {payment.method}
+                                                        </Box>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Chip
+                                                            label={payment.status}
+                                                            color={getStatusColor(payment.status)}
+                                                            size="small"
+                                                        />
+                                                    </TableCell>
+                                                </StyledTableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Paper>
+                        ) : (
+                            <Typography variant="h6" sx={{ textAlign: "center", p: 3 }}>
+                                No Payment History Available
                             </Typography>
-                            <TableContainer>
-                                <Table aria-label="payment history table">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell sx={{ color: "text.primary" }}>Date</TableCell>
-                                            <TableCell sx={{ color: "text.primary" }}>Amount</TableCell>
-                                            <TableCell sx={{ color: "text.primary" }}>Payment Method</TableCell>
-                                            <TableCell sx={{ color: "text.primary" }}>Status</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {paymentHistory.map((payment) => (
-                                            <StyledTableRow key={payment.id}>
-                                                <TableCell sx={{ color: "text.secondary" }}>{payment.date}</TableCell>
-                                                <TableCell sx={{ color: "text.secondary" }}>${payment.amount.toFixed(2)}</TableCell>
-                                                <TableCell sx={{ color: "text.secondary" }}>
-                                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                                        <FiCreditCard color={theme.palette.text.primary} />
-                                                        {payment.method}
-                                                    </Box>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Chip
-                                                        label={payment.status}
-                                                        color={getStatusColor(payment.status)}
-                                                        size="small"
-                                                    />
-                                                </TableCell>
-                                            </StyledTableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </Paper>
+                        )}
                     </Grid>
+
                 </Grid>
             </Box>
         </DashboardLayout>

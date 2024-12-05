@@ -11,6 +11,8 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-register-2.jpg";
 import Cookies from "js-cookie";
+import swal from 'sweetalert';
+
 
 function Basic() {
   const navigate = useNavigate();
@@ -28,7 +30,12 @@ function Basic() {
 
     // Validate inputs
     if (!username || !password) {
-      alert("Please enter both username and password!");
+      swal({
+        title: "",
+        text: "Please Enter username or Password",
+        icon: "info",
+        button: "Done",
+      });
       return;
     }
 
@@ -49,7 +56,13 @@ function Basic() {
         if (token) {
           const modifiedToken = token.substring(7); // Remove "Bearer " prefix
           Cookies.set("jwtToken", modifiedToken, { expires: 7 });
-          alert("Login successful! Token saved in the cookie.");
+          // alert("Login successful! Token saved in the cookie.");
+          swal({
+            title: data.message,
+            text: "",
+            icon: "success",
+            button: "Done",
+          });
           navigate("/dashboard");
         } else {
           throw new Error("JWT Token not found in response body.");
@@ -57,11 +70,21 @@ function Basic() {
       } else {
         // Handle errors based on the API response
         const errorData = await response.json();
-        alert(`Error: ${errorData.message || "Login failed! Please try again."}`);
+        swal({
+          title: errorData.message,
+          text: "",
+          icon: "warning",
+          button: "Done",
+        });
       }
     } catch (error) {
       console.error("Error during login:", error);
-      alert(`Error: ${error.message}`);
+      swal({
+        title: error.message,
+        text: "",
+        icon: "error",
+        button: "Done",
+      });
     }
   };
 

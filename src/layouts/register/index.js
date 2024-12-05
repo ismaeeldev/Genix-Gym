@@ -13,15 +13,32 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { Cookie } from "@mui/icons-material";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import swal from 'sweetalert';
+
+
+
+import AppBar from "@mui/material/AppBar";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Icon from "@mui/material/Icon";
 
 function Register() {
+    const jwtToken = Cookies.get("jwtToken"); // Retrieve JWT token from cookies
+    const [tabsOrientation, setTabsOrientation] = useState("horizontal");
+    const [tabValue, setTabValue] = useState(0);
+    const [TrainerRegisterForm, setRegistrationForm] = useState(false);
+
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         phone: "",
         address: "",
         blood_group: "",
-        age: "",
+        dateOfBirth: "",
         gender: "",
         membership_type: "Daily",
     });
@@ -34,12 +51,31 @@ function Register() {
         }));
     };
 
+    const handleSetTabValue = (event, newValue) => {
+        setTabValue(newValue);
+        setRegistrationForm(newValue === 1); // Set Trainer form if tab 1 is selected
+    };
+
+    const handleDateChange = (newDate) => {
+        const formattedDate = dayjs(newDate).format('YYYY-MM-DDTHH:mm:ss');
+        setFormData((prev) => ({
+            ...prev,
+            dateOfBirth: formattedDate,
+        }));
+    };
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const jwtToken = Cookies.get("jwtToken"); // Retrieve JWT token from cookies
+        const API = TrainerRegisterForm
+            ? "http://localhost:8080/api/auth/welcome"
+            : "http://localhost:8080/api/member/add-members";
+
+
         try {
-            const response = await fetch("http://localhost:8080/api/member/add-members", {
+
+            const response = await fetch(API, {
                 method: "POST",
                 headers: {
                     'Authorization': `Bearer ${jwtToken}`,
@@ -51,34 +87,45 @@ function Register() {
             const data = await response.json(); // Parse the JSON response
 
             if (!response.ok) {
-                // Display the message from the API for errors
-                throw new Error(data.message || "Failed to register. Please try again.");
+                // Display the messdateOfBirth from the API for errors
+                throw new Error(data.messdateOfBirth || "Failed to register. Please try again.");
             }
 
-            // Display the success message from the API
+            // Display the success messdateOfBirth from the API
             console.log("Registration successful:", data);
-            alert(data.message || "Registration successful!");
+            swal({
+                title: data.message,
+                text: "",
+                icon: "success",
+                button: "Done",
+            });
             setFormData({
                 name: "",
                 email: "",
                 phone: "",
                 address: "",
                 blood_group: "",
-                age: "",
+                dateOfBirth: "",
                 gender: "",
                 membership_type: "Daily",
             });
 
         } catch (error) {
             console.error("Error:", error);
-            alert(error.message || "An error occurred.");
+            swal({
+                title: error.message,
+                text: "",
+                icon: "error",
+                button: "Done",
+            });
+
             setFormData({
                 name: "",
                 email: "",
                 phone: "",
                 address: "",
                 blood_group: "",
-                age: "",
+                dateOfBirth: "",
                 gender: "",
                 membership_type: "Daily",
             });
@@ -113,12 +160,55 @@ function Register() {
                         textAlign="center"
                         py={3}
                     >
-                        <MDTypography variant="h4" fontWeight="medium" color="white">
+                        {/* <MDTypography variant="h4" fontWeight="medium" color="white">
                             Join us today
-                        </MDTypography>
+                        </MDTypography> */}
+                        <Grid
+                            container
+                            justifyContent="center"  // Center horizontally
+                            alignItems="center"      // Center vertically (optional)
+                        >
+                            <Grid
+                                item
+                                xs={12}
+                                md={6}
+                                lg={4}
+                                sx={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <AppBar position="static">
+                                    <Tabs
+                                        orientation={tabsOrientation}
+                                        value={tabValue}
+                                        onChange={handleSetTabValue}
+                                    >
+                                        <Tab
+                                            label="Member"
+                                            icon={
+                                                <Icon fontSize="small" sx={{ mt: -0.25 }}>
+                                                    person
+                                                </Icon>
+                                            }
+                                        />
+                                        <Tab
+                                            label="Trainer"
+                                            icon={
+                                                <Icon fontSize="small" sx={{ mt: -0.25 }}>
+                                                    badge
+                                                </Icon>
+                                            }
+                                        />
+                                    </Tabs>
+                                </AppBar>
+                            </Grid>
+                        </Grid>
+
                         <MDTypography display="block" variant="button" color="white" my={1}>
-                            Register new Member
+                            {TrainerRegisterForm ? "Register New Trainer" : "Register New Member"}
                         </MDTypography>
+
                     </MDBox>
                     <MDBox pt={4} pb={3} px={3}>
                         <MDBox component="form" role="form" onSubmit={handleSubmit}>
@@ -179,16 +269,16 @@ function Register() {
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
-                                    <MDInput
-                                        type="text"
-                                        label="Age"
-                                        name="age"
-                                        value={formData.age}
-                                        onChange={handleChange}
-                                        variant="standard"
-                                        fullWidth
-                                    />
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DatePicker
+                                            label="Date of Birth"
+                                            value={formData.dateOfBirth ? dayjs(formData.dateOfBirth) : null}
+                                            onChange={handleDateChange} // Use the separate date handler
+                                            slotProps={{ textField: { variant: "standard", fullWidth: true } }}
+                                        />
+                                    </LocalizationProvider>
                                 </Grid>
+
                                 <Grid item xs={12}>
                                     <MDInput
                                         type="text"
@@ -200,28 +290,29 @@ function Register() {
                                         fullWidth
                                     />
                                 </Grid>
-                                <Grid item xs={12}>
-                                    <FormGroup row>
-                                        {["Daily", "Monthly", "Yearly"].map((option) => (
-                                            <FormControlLabel
-                                                key={option}
-                                                control={
-                                                    <Checkbox
-                                                        checked={formData.membership_type === option}
-                                                        onChange={() =>
-                                                            setFormData((prev) => ({
-                                                                ...prev,
-                                                                membership_type: option,
-                                                            }))
-                                                        }
-                                                        name="membership_type"
-                                                    />
-                                                }
-                                                label={option}
-                                            />
-                                        ))}
-                                    </FormGroup>
-                                </Grid>
+                                {!TrainerRegisterForm ?
+                                    <Grid item xs={12}>
+                                        <FormGroup row>
+                                            {["Daily", "Monthly", "Yearly"].map((option) => (
+                                                <FormControlLabel
+                                                    key={option}
+                                                    control={
+                                                        <Checkbox
+                                                            checked={formData.membership_type === option}
+                                                            onChange={() =>
+                                                                setFormData((prev) => ({
+                                                                    ...prev,
+                                                                    membership_type: option,
+                                                                }))
+                                                            }
+                                                            name="membership_type"
+                                                        />
+                                                    }
+                                                    label={option}
+                                                />
+                                            ))}
+                                        </FormGroup>
+                                    </Grid> : ""}
 
                                 <Grid item xs={12}>
                                     <MDButton

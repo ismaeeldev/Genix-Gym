@@ -18,7 +18,6 @@ import Grid from "@mui/material/Grid";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-import Loader from 'components/Loader';
 
 // Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -47,12 +46,12 @@ import Cookies from "js-cookie";
 function Dashboard() {
   const navigate = useNavigate();
   const { sales, tasks } = reportsLineChartData;
-  const [cookies] = useCookies(["jwtToken"]);
-  const [message, setMessage] = useState("");
+  // const [cookies] = useCookies(["jwtToken"]);
+  // const [message, setMessage] = useState("");
+  const jwtToken = Cookies.get("jwtToken");
+  const [dashboardData, setDashboardData] = useState({ totalMembers: "", currentMembers: "", membersThisMonth: "", totalTrainers: "" })
 
   const hello = async () => {
-    const jwtToken = Cookies.get("jwtToken"); // Retrieve JWT token from cookies
-    // console.log(jwtToken);
 
     try {
       const response = await fetch('http://localhost:8080/api/auth/welcome', {
@@ -75,15 +74,50 @@ function Dashboard() {
 
       // Parse and log the successful response as JSON
       const json = await response.text();
-      console.log(JSON.stringify(json));
-      setMessage(JSON.stringify(json));
     } catch (err) {
       console.error("Error:", err);
       alert("Error: " + err.message);
     }
   };
 
+
+  const Dashboard = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/member/dashboard/home', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${jwtToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const responseData = await response.text(); // Get the error response as text
+        alert("Error: " + responseData);
+        navigate("/authentication/sign-in");
+        Cookies.remove("jwtToken");
+        return;
+      }
+
+      const data = await response.json();
+
+      setDashboardData({ totalMembers: data.totalMembers, currentMembers: data.currentMembers, membersThisMonth: data.membersThisMonth, totalTrainers: data.totalTrainers })
+
+    } catch (err) {
+      console.error("Error:", err);
+      alert("Error: " + err.message);
+    }
+  };
+
+
+
+
   useEffect(() => {
+
+    // setTimeout(() => {
+    //   navigate("/Loader")
+
+    // }, 9000);
     // Retrieve the token from cookies
     const jwtToken = Cookies.get("jwtToken");
 
@@ -95,6 +129,7 @@ function Dashboard() {
 
   useEffect(() => {
     hello();
+    Dashboard();
   }, []);
 
   return (
@@ -107,12 +142,12 @@ function Dashboard() {
               <ComplexStatisticsCard
                 color="dark"
                 icon="groups"
-                title="Total Member"
-                count={281}
+                title="Total Members"
+                count={dashboardData.totalMembers}
                 percentage={{
                   color: "success",
-                  amount: "+55%",
-                  label: message
+                  amount: "",
+                  label: "Just updated",
                 }}
               />
             </MDBox>
@@ -121,12 +156,12 @@ function Dashboard() {
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
                 icon="store"
-                title="Total Revenue"
-                count="2,300"
+                title="Current Members"
+                count={dashboardData.currentMembers}
                 percentage={{
                   color: "success",
-                  amount: "+3%",
-                  label: "than last month",
+                  amount: "",
+                  label: "Just updated",
                 }}
               />
             </MDBox>
@@ -136,12 +171,12 @@ function Dashboard() {
               <ComplexStatisticsCard
                 color="success"
                 icon="payment"
-                title="Pending Fees"
-                count="34k"
+                title="Member this month"
+                count={dashboardData.membersThisMonth}
                 percentage={{
                   color: "success",
-                  amount: "+1%",
-                  label: "than yesterday",
+                  amount: "",
+                  label: "Just updated",
                 }}
               />
             </MDBox>
@@ -151,8 +186,8 @@ function Dashboard() {
               <ComplexStatisticsCard
                 color="primary"
                 icon="person_add"
-                title="New Members"
-                count="+91"
+                title=" Total Trainers"
+                count={dashboardData.totalTrainers}
                 percentage={{
                   color: "success",
                   amount: "",
@@ -162,27 +197,20 @@ function Dashboard() {
             </MDBox>
           </Grid>
         </Grid>
-        <MDBox mt={4.5}>
-          <Grid container spacing={3}>
-            <Grid item xs={2} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsBarChart
-                  color="info"
-                  title="website views"
-                  description="Last Campaign Performance"
-                  date="campaign sent 2 days ago"
-                  chart={reportsBarChartData}
-                />
-              </MDBox>
-            </Grid>
-            <Grid item xs={12} md={6} lg={4}>
+
+
+
+        <MDBox mt={6}>
+          <Grid container spacing={3} alignItems="stretch">
+            <Grid item xs={12} md={8} mt={3}>
+              {/* 70% Chart Component */}
               <MDBox mb={3}>
                 <ReportsLineChart
                   color="success"
                   title="daily sales"
                   description={
                     <>
-                      (<strong>+15%</strong>) increase in today sales.
+                      (<strong>+15%</strong>) increase in todays sales.
                     </>
                   }
                   date="updated 4 min ago"
@@ -190,29 +218,23 @@ function Dashboard() {
                 />
               </MDBox>
             </Grid>
-            <Grid item xs={12} md={6} lg={4}>
+
+            <Grid item xs={12} md={4}>
               <MDBox mb={3}>
-                <ReportsLineChart
-                  color="dark"
-                  title="completed tasks"
-                  description="Last Campaign Performance"
-                  date="just updated"
-                  chart={tasks}
-                />
+                <OrdersOverview />
               </MDBox>
             </Grid>
           </Grid>
         </MDBox>
-        <MDBox>
+
+        {/* <MDBox>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={8}>
               <Projects />
             </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <OrdersOverview />
-            </Grid>
+
           </Grid>
-        </MDBox>
+        </MDBox> */}
       </MDBox>
       <Footer />
     </DashboardLayout>
