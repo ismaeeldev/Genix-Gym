@@ -119,7 +119,12 @@ export default function data(searchForm) {
       setTotalPage(data.totalPages);
     } catch (error) {
       console.error("Failed to fetch user data:", error);
-      alert("Failed to fetch data. Please try again.");
+      swal({
+        title: "Failed to fetch Data",
+        text: "Please try again",
+        icon: "error",
+        button: "Done",
+      });
       setUserData([]); // fallback to an empty array if fetch fails
     }
   }

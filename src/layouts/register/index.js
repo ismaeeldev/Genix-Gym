@@ -43,6 +43,16 @@ function Register() {
         membership_type: "Daily",
     });
 
+    const [trainerData, setTrainerData] = useState({
+        name: "",
+        email: "",
+        phone: "",
+        salary: "",
+        experienceYears: "",
+        gender: "",
+        bio: "",
+    })
+
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData((prev) => ({
@@ -50,6 +60,15 @@ function Register() {
             [name]: type === "checkbox" ? checked : value,
         }));
     };
+
+    const handleTrainerChange = (e) => {
+        const { name, value } = e.target;
+        setTrainerData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
 
     const handleSetTabValue = (event, newValue) => {
         setTabValue(newValue);
@@ -68,9 +87,7 @@ function Register() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const API = TrainerRegisterForm
-            ? "http://localhost:8080/api/auth/welcome"
-            : "http://localhost:8080/api/member/add-members";
+        const API = "http://localhost:8080/api/member/add-members";
 
 
         try {
@@ -88,7 +105,7 @@ function Register() {
 
             if (!response.ok) {
                 // Display the messdateOfBirth from the API for errors
-                throw new Error(data.messdateOfBirth || "Failed to register. Please try again.");
+                throw new Error(data.message || "Failed to register. Please try again.");
             }
 
             // Display the success messdateOfBirth from the API
@@ -132,6 +149,10 @@ function Register() {
 
         }
     };
+
+    const handleTrainerSubmit = async () => {
+        console.log(trainerData)
+    }
 
 
     return (
@@ -205,92 +226,120 @@ function Register() {
                             </Grid>
                         </Grid>
 
-                        <MDTypography display="block" variant="button" color="white" my={1}>
-                            {TrainerRegisterForm ? "Register New Trainer" : "Register New Member"}
+                        <MDTypography
+                            display="block"
+                            variant="button"
+                            color={
+                                (!TrainerRegisterForm && formData.phone && (formData.phone.length < 11 || formData.phone.length > 11)) ||
+                                    (TrainerRegisterForm && trainerData.phone && (trainerData.phone.length < 11 || trainerData.phone.length > 11))
+                                    ? "error"
+                                    : "white"
+                            }
+                            fontWeight={
+                                (!TrainerRegisterForm && formData.phone && (formData.phone.length < 11 || formData.phone.length > 11)) ||
+                                    (TrainerRegisterForm && trainerData.phone && (trainerData.phone.length < 11 || trainerData.phone.length > 11))
+                                    ? "bold"
+                                    : "regular"
+                            }
+                            my={1}
+                        >
+                            {!TrainerRegisterForm
+                                ? formData.phone && (formData.phone.length < 11 || formData.phone.length > 11)
+                                    ? "Invalid phone number format"
+                                    : "Register New Member"
+                                : trainerData.phone && (trainerData.phone.length < 11 || trainerData.phone.length > 11)
+                                    ? "Invalid phone number format"
+                                    : "Register New Trainer"}
                         </MDTypography>
 
-                    </MDBox>
-                    <MDBox pt={4} pb={3} px={3}>
-                        <MDBox component="form" role="form" onSubmit={handleSubmit}>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12} sm={6}>
-                                    <MDInput
-                                        type="text"
-                                        label="Name"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleChange}
-                                        variant="standard"
-                                        fullWidth
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <MDInput
-                                        type="email"
-                                        label="Email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        variant="standard"
-                                        fullWidth
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <MDInput
-                                        type="text"
-                                        label="Phone Number"
-                                        name="phone"
-                                        value={formData.phone}
-                                        onChange={handleChange}
-                                        variant="standard"
-                                        fullWidth
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <MDInput
-                                        type="text"
-                                        label="Address"
-                                        name="address"
-                                        value={formData.address}
-                                        onChange={handleChange}
-                                        variant="standard"
-                                        fullWidth
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <MDInput
-                                        type="text"
-                                        label="Gender"
-                                        name="gender"
-                                        value={formData.gender}
-                                        onChange={handleChange}
-                                        variant="standard"
-                                        fullWidth
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <DatePicker
-                                            label="Date of Birth"
-                                            value={formData.dateOfBirth ? dayjs(formData.dateOfBirth) : null}
-                                            onChange={handleDateChange} // Use the separate date handler
-                                            slotProps={{ textField: { variant: "standard", fullWidth: true } }}
-                                        />
-                                    </LocalizationProvider>
-                                </Grid>
 
-                                <Grid item xs={12}>
-                                    <MDInput
-                                        type="text"
-                                        label="Blood Group"
-                                        name="blood_group"
-                                        value={formData.blood_group}
-                                        onChange={handleChange}
-                                        variant="standard"
-                                        fullWidth
-                                    />
-                                </Grid>
-                                {!TrainerRegisterForm ?
+
+
+
+
+                    </MDBox>
+
+                    <MDBox pt={4} pb={3} px={3}>
+                        {!TrainerRegisterForm ?
+                            <MDBox component="form" role="form" onSubmit={handleSubmit}>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={12} sm={6}>
+                                        <MDInput
+                                            type="text"
+                                            label="Name"
+                                            name="name"
+                                            value={formData.name}
+                                            onChange={handleChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <MDInput
+                                            type="email"
+                                            label="Email"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <MDInput
+                                            type="text"
+                                            label="Phone Number"
+                                            name="phone"
+                                            value={formData.phone}
+                                            onChange={handleChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <MDInput
+                                            type="text"
+                                            label="Address"
+                                            name="address"
+                                            value={formData.address}
+                                            onChange={handleChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <MDInput
+                                            type="text"
+                                            label="Gender"
+                                            name="gender"
+                                            value={formData.gender}
+                                            onChange={handleChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                label="Date of Birth"
+                                                value={formData.dateOfBirth ? dayjs(formData.dateOfBirth) : null}
+                                                onChange={handleDateChange} // Use the separate date handler
+                                                slotProps={{ textField: { variant: "standard", fullWidth: true } }}
+                                            />
+                                        </LocalizationProvider>
+                                    </Grid>
+
+                                    <Grid item xs={12}>
+                                        <MDInput
+                                            type="text"
+                                            label="Blood Group"
+                                            name="blood_group"
+                                            value={formData.blood_group}
+                                            onChange={handleChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
+                                    </Grid>
                                     <Grid item xs={12}>
                                         <FormGroup row>
                                             {["Daily", "Monthly", "Yearly"].map((option) => (
@@ -312,20 +361,120 @@ function Register() {
                                                 />
                                             ))}
                                         </FormGroup>
-                                    </Grid> : ""}
+                                    </Grid>
 
-                                <Grid item xs={12}>
-                                    <MDButton
-                                        type="submit"
-                                        variant="gradient"
-                                        color="info"
-                                        fullWidth
-                                    >
-                                        Register
-                                    </MDButton>
+                                    <Grid item xs={12}>
+                                        <MDButton
+                                            type="submit"
+                                            variant="gradient"
+                                            color="info"
+                                            fullWidth
+                                        >
+                                            Register Member
+                                        </MDButton>
+                                    </Grid>
                                 </Grid>
-                            </Grid>
-                        </MDBox>
+                            </MDBox> :
+
+                            // trainer register field
+                            <MDBox component="form" role="form" onSubmit={handleTrainerSubmit}>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={12} sm={6}>
+                                        <MDInput
+                                            type="text"
+                                            label="Name"
+                                            name="name"
+                                            value={trainerData.name}
+                                            onChange={handleTrainerChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <MDInput
+                                            type="email"
+                                            label="Email"
+                                            name="email"
+                                            value={trainerData.email}
+                                            onChange={handleTrainerChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <MDInput
+                                            type="text"
+                                            label="Phone Number"
+                                            name="phone"
+                                            value={trainerData.phone}
+                                            onChange={handleTrainerChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <MDInput
+                                            type="text"
+                                            label="Salary"
+                                            name="salary"
+                                            value={trainerData.salary}
+                                            onChange={handleTrainerChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <MDInput
+                                            type="text"
+                                            label="Gender"
+                                            name="gender"
+                                            value={trainerData.gender}
+                                            onChange={handleTrainerChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
+                                    </Grid>
+
+
+                                    <Grid item xs={12} sm={6}>
+                                        <MDInput
+                                            type="number"
+                                            label="Experience Years "
+                                            name="experienceYears"
+                                            value={trainerData.experienceYears}
+                                            onChange={handleTrainerChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
+                                    </Grid>
+
+                                    <Grid item xs={12}>
+                                        <MDInput
+                                            type="text"
+                                            label="bio"
+                                            name="bio"
+                                            value={trainerData.bio}
+                                            onChange={handleTrainerChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
+                                    </Grid>
+
+
+                                    <Grid item xs={12}>
+                                        <MDButton
+                                            // type="submit"
+                                            variant="gradient"
+                                            color="info"
+                                            fullWidth
+                                            onClick={handleTrainerSubmit}
+                                        >
+                                            Register Trainer
+                                        </MDButton>
+                                    </Grid>
+                                </Grid>
+                            </MDBox>
+                        }
                     </MDBox>
                 </Card>
             </MDBox>

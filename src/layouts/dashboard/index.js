@@ -93,7 +93,12 @@ function Dashboard() {
 
       if (!response.ok) {
         const responseData = await response.text(); // Get the error response as text
-        alert("Error: " + responseData);
+        swal({
+          title: responseData,
+          text: "",
+          icon: "error",
+          button: "Done",
+        });
         navigate("/authentication/sign-in");
         Cookies.remove("jwtToken");
         return;
@@ -105,7 +110,15 @@ function Dashboard() {
 
     } catch (err) {
       console.error("Error:", err);
-      alert("Error: " + err.message);
+      swal({
+        title: "Internal Server Error ",
+        text: "",
+        icon: "error",
+        button: "Done",
+      });
+      navigate("/authentication/sign-in");
+
+
     }
   };
 
@@ -123,6 +136,12 @@ function Dashboard() {
 
     // Redirect if the token does not exist
     if (!jwtToken) {
+      swal({
+        title: "Session Expired",
+        text: "",
+        icon: "info",
+        button: "Done",
+      });
       navigate("/authentication/sign-in");
     }
   }, [navigate]);

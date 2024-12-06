@@ -94,7 +94,6 @@ const routes = [
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/register",
     component: <Register />,
-
   },
   {
     type: "collapse",
@@ -122,13 +121,15 @@ const routes = [
   },
   {
     route: "/payment-history",
+    key: "payment-history", // Added a unique key
     component: <Report />,
   },
-
   {
     route: "/Loader",
+    key: "loader", // Added a unique key
     component: <Loader />,
   },
 ];
+
 
 export default routes;

@@ -49,7 +49,14 @@ function OrdersOverview() {
 
       if (!response.ok) {
         const responseData = await response.text();
-        alert("Error: " + responseData);
+
+        swal({
+          title: responseData,
+          text: "",
+          icon: "error ",
+          button: "Done",
+        });
+
         navigate("/authentication/sign-in");
         Cookies.remove("jwtToken");
         return;
@@ -60,7 +67,14 @@ function OrdersOverview() {
 
     } catch (err) {
       console.error("Error:", err);
-      alert("Error: " + err.message);
+      swal({
+        title: "Internal Server Error ",
+        text: "",
+        icon: "error ",
+        button: "Done",
+      });
+      navigate("/authentication/sign-in");
+
     }
   };
 
@@ -81,53 +95,35 @@ function OrdersOverview() {
         <TimelineItem
           color="success"
           icon="notifications"
-          title={FeeStatus.upcoming1to2days}
-          dateTime="Upcoming 3-4 Days"
+          title={String(FeeStatus.upcoming1to2days)}
+          dateTime="Upcoming 1-2 Days"
         />
-
         <TimelineItem
           color="success"
           icon="notifications"
-          title={FeeStatus.upcoming3to4days}
-          dateTime="Upcoming 1-2 Days"
+          title={String(FeeStatus.upcoming3to4days)}
+          dateTime="Upcoming 3-4 Days"
         />
-
         <TimelineItem
           color="warning"
           icon="payment"
-          title={FeeStatus.willbeunpaidtoday}
+          title={String(FeeStatus.willbeunpaidtoday)}
           dateTime="Unpaid Today"
         />
-
         <TimelineItem
           color="error"
           icon={<NotificationsActiveIcon />}
-          title={FeeStatus.unpaid1to3days}
+          title={String(FeeStatus.unpaid1to3days)}
+          dateTime="Unpaid 1-3 Days"
+        />
+        <TimelineItem
+          color="error"
+          icon={<NotificationsActiveIcon />}
+          title={String(FeeStatus.unpaid4to7days)}
           dateTime="Unpaid 4-7 Days"
         />
-        <TimelineItem
-          color="error"
-          icon={<NotificationsActiveIcon />}
-          title={FeeStatus.unpaid4to7days}
-          dateTime="Unpaid More Than 7 Days"
-        />
-
-
-        {/* <TimelineItem
-          color="info"
-          icon="shopping_cart"
-          title="Server payments for April"
-          dateTime="21 DEC 9:34 PM"
-        /> */}
-
-        {/* <TimelineItem
-          color="primary"
-          icon="vpn_key"
-          title="New card added for order #4395133"
-          dateTime="18 DEC 4:54 AM"
-          lastItem
-        /> */}
       </MDBox>
+
     </Card>
   );
 }
