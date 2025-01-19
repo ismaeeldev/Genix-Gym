@@ -52,9 +52,13 @@ import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "co
 // Images
 import brandWhite from "assets/images/logo-ct.png";
 import brandDark from "assets/images/logo-ct-dark.png";
+import LoadingContainer from 'components/Loader'
 
 export default function App() {
+
   const [controller, dispatch] = useMaterialUIController();
+  const [loading, setLoading] = useState(true); // Loading state
+
   const {
     miniSidenav,
     direction,
@@ -146,6 +150,33 @@ export default function App() {
     </MDBox>
   );
 
+  useEffect(() => {
+    // Show loading for 10 seconds
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 5000); // 10 seconds
+
+    // Clean up timer when the component is unmounted
+    return () => {
+      clearTimeout(timer);
+    };
+  })
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <LoadingContainer /> {/* This is the loading spinner */}
+      </div>
+    );
+  }
+
   return direction === "rtl" ? (
     <CacheProvider value={rtlCache}>
       <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
@@ -167,7 +198,7 @@ export default function App() {
         {layout === "vr" && <Configurator />}
         <Routes>
           {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/dashboard" />} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </ThemeProvider>
     </CacheProvider>
@@ -191,7 +222,7 @@ export default function App() {
       {layout === "vr" && <Configurator />}
       <Routes>
         {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </ThemeProvider>
   );

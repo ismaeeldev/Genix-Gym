@@ -46,7 +46,7 @@ import SignUp from "layouts/authentication/sign-up";
 import Register from "layouts/register"
 import UserTable from 'layouts/tables'
 import FeeTable from 'layouts/fee'
-import Report from 'components/Report'
+import UserHistory from 'components/UserHistory'
 import Loader from "components/Loader"
 
 
@@ -68,7 +68,7 @@ const routes = [
     name: "Member Data",
     key: "tables",
     icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/tables",
+    route: "/member-data",
     component: <UserTable />,
   },
   {
@@ -112,17 +112,14 @@ const routes = [
     component: <Profile />,
   },
   {
-    type: "collapse",
-    name: "Sign In",
     key: "sign-in",
-    icon: <Icon fontSize="small">login</Icon>,
     route: "/authentication/sign-in",
     component: <SignIn />,
   },
   {
     route: "/payment-history",
     key: "payment-history", // Added a unique key
-    component: <Report />,
+    component: <UserHistory />,
   },
   {
     route: "/Loader",

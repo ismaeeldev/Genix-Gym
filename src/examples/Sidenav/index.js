@@ -13,7 +13,7 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 
@@ -55,13 +55,26 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const location = useLocation();
   const collapseName = location.pathname.replace("/", "");
   const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Track if user is authenticated
+
 
   //logout function 
 
   const onLogout = () => {
     Cookies.remove("jwtToken");
+    setIsAuthenticated(false);
     navigate("/authentication/sign-in");
   }
+
+
+  useEffect(() => {
+    const token = Cookies.get("jwtToken");
+    if (!token) {
+      navigate("/authentication/sign-in"); // Redirect to sign-in if no token
+    } else {
+      setIsAuthenticated(true); // Set authenticated state if token exists
+    }
+  }, [navigate]);
 
 
   let textColor = "white";
@@ -150,6 +163,10 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
 
     return returnValue;
   });
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <SidenavRoot

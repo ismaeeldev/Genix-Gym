@@ -22,6 +22,8 @@ import { createContext, useContext, useReducer, useMemo } from "react";
 
 // prop-types is a library for typechecking of props
 import PropTypes from "prop-types";
+import Cookies from "js-cookie";
+import { Cookie } from "@mui/icons-material";
 
 // Material Dashboard 2 React main context
 const MaterialUI = createContext();
@@ -60,6 +62,7 @@ function reducer(state, action) {
       return { ...state, layout: action.value };
     }
     case "DARKMODE": {
+      Cookies.set("darkMode", action.value, { expires: 7 }); // Save darkMode to cookies (7 days expiration)
       return { ...state, darkMode: action.value };
     }
     default: {
@@ -80,7 +83,7 @@ function MaterialUIControllerProvider({ children }) {
     openConfigurator: false,
     direction: "ltr",
     layout: "dashboard",
-    darkMode: false,
+    darkMode: Cookies.get("darkMode") === "true",
   };
 
   const [controller, dispatch] = useReducer(reducer, initialState);

@@ -49,7 +49,15 @@ const UpdateModal = ({ open, onClose, user }) => {
     const [error, setError] = useState("");
     const [touched, setTouched] = useState({});
     const isMobile = useMediaQuery("(max-width:600px)");
-    const [formData, setFormData] = useState({ name: "", email: "", phone: "", address: "", blood_group: "" });
+    const safeUser = user || {}; // Ensure user is at least an empty object
+
+    const [formData, setFormData] = useState({
+        name: safeUser.name || "",
+        email: safeUser.email || "",
+        phone: safeUser.phone || "",
+        address: safeUser.address || "",
+        blood_group: safeUser.blood_group || "",
+    });
 
     useEffect(() => {
         if (user) {
@@ -59,10 +67,10 @@ const UpdateModal = ({ open, onClose, user }) => {
                 phone: user.phone || "",
                 address: user.address || "",
                 blood_group: user.blood_group || ""
-
             });
         }
     }, [user]);
+
 
 
 
@@ -72,18 +80,20 @@ const UpdateModal = ({ open, onClose, user }) => {
             if (event.key === "Escape") {
                 onClose();
             }
+
         };
         window.addEventListener("keydown", handleEscape);
         return () => window.removeEventListener("keydown", handleEscape);
     }, [onClose]);
 
     const handleChange = (field) => (event) => {
-        setFormData(prev => ({
+        const value = event.target.value;
+        setFormData((prev) => ({
             ...prev,
-            [field]: event.target.value
+            [field]: value,
         }));
-        setError("");
     };
+
 
     const handleBlur = (field) => () => {
         setTouched(prev => ({
@@ -131,7 +141,12 @@ const UpdateModal = ({ open, onClose, user }) => {
             const data = await response.json();
 
             if (response.ok) {
-                alert(data.message);
+                swal({
+                    title: data.message,
+                    text: "",
+                    icon: "success",
+                    button: "Done",
+                });
                 onClose();
             } else {
                 setError(data.message || "Failed to update profile. Please try again.");
@@ -207,8 +222,12 @@ const UpdateModal = ({ open, onClose, user }) => {
                             onChange={handleChange("email")}
                             onBlur={handleBlur("email")}
                             error={touched.email && (!formData.email || !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email))}
-                            helperText={touched.email && !formData.email ? "Email is required" : touched.email && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email) ? "Invalid email format" : ""}
+                            helperText={touched.email && !formData.email ? "Email is required" : ""}
                             disabled={loading}
+                            sx={{
+                                "& .MuiInputBase-input": { color: "#000" }, // Strictly set input text color to black
+                                "& .MuiFormLabel-root": { color: "rgba(0, 0, 0, 0.6)" }, // Label color
+                            }}
                         />
                     </Box>
 
@@ -223,6 +242,10 @@ const UpdateModal = ({ open, onClose, user }) => {
                             error={touched.phone && !formData.phone}
                             helperText={touched.phone && !formData.phone ? "Phone number is required" : ""}
                             disabled={loading}
+                            sx={{
+                                "& .MuiInputBase-input": { color: "#000" }, // Strictly set input text color to black
+                                "& .MuiFormLabel-root": { color: "rgba(0, 0, 0, 0.6)" }, // Label color
+                            }}
                         />
                     </Box>
 
@@ -237,6 +260,10 @@ const UpdateModal = ({ open, onClose, user }) => {
                             error={touched.address && !formData.address}
                             helperText={touched.address && !formData.address ? "Address is required" : ""}
                             disabled={loading}
+                            sx={{
+                                "& .MuiInputBase-input": { color: "#000" }, // Strictly set input text color to black
+                                "& .MuiFormLabel-root": { color: "rgba(0, 0, 0, 0.6)" }, // Label color
+                            }}
                         />
                     </Box>
 
@@ -251,6 +278,10 @@ const UpdateModal = ({ open, onClose, user }) => {
                             error={touched.blood_group && !formData.blood_group}
                             helperText={touched.blood_group && !formData.blood_group ? "Blood Group  is required" : ""}
                             disabled={loading}
+                            sx={{
+                                "& .MuiInputBase-input": { color: "#000" }, // Strictly set input text color to black
+                                "& .MuiFormLabel-root": { color: "rgba(0, 0, 0, 0.6)" }, // Label color
+                            }}
                         />
                     </Box>
 

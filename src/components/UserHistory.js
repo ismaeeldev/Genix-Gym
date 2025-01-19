@@ -21,20 +21,15 @@ import { FiUser, FiMail, FiPhone, FiCreditCard } from "react-icons/fi";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Cookies from "js-cookie";
 import { useLocation } from 'react-router-dom';
+import { useMaterialUIController } from "../context"; // Adjust path if needed
 
 
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    "&:nth-of-type(odd)": {
-        backgroundColor: theme.palette.mode === "dark" ? "#1a1a1a" : "#f5f5f5",
-    },
-    "&:hover": {
-        backgroundColor: theme.palette.mode === "dark" ? "#2a2a2a" : "#eeeeee",
-        transition: "background-color 0.3s ease",
-    },
-}));
 
-const UserReport = (id) => {
+
+// const color = Cookies.get("darkMode") === "true" ? "#1f1d1d !important" : " #121111 !important";
+
+const UserHistory = (id) => {
 
     const jwtToken = Cookies.get("jwtToken");
     const location = useLocation();
@@ -42,12 +37,30 @@ const UserReport = (id) => {
     const [userData, setUserData] = useState({});
     const [paymentHistory, setPaymentHistory] = useState([]);
     const { user } = location.state || {};
+    const [controller] = useMaterialUIController();
+    const { darkMode } = controller;
+
+    const [color, setColor] = useState(""); // state to hold color value
+
+    const StyledTableRow = styled(TableRow)(({ theme }) => ({
+        "&:nth-of-type(odd)": {
+            // backgroundColor: darkMode === "dark" ? "#1a1a1a" : "#f5f5f5",
+            backgroundColor: darkMode ? "#1a1a1a" : "#f5f5f5",
+
+        },
+
+    }));
+
+
+    useEffect(() => {
+        // Dynamically update color based on darkMode state 1f1d1d
+        const newColor = darkMode ? "#f7f5f5 !important" : "#1f1d1d !important";
+        setColor(newColor);
+    }, [darkMode]);
 
 
 
     useEffect(() => {
-
-        console.log(user);
 
         setUserData({
             name: user?.name,
@@ -101,7 +114,7 @@ const UserReport = (id) => {
     return (
         <DashboardLayout>
 
-            <Box sx={{ p: 3, maxWidth: 1200, margin: "0 auto", bgcolor: theme.palette.mode === "dark" ? "#121212" : "background.default" }}>
+            <Box sx={{ p: 3, maxWidth: 1200, margin: "0 auto", bgcolor: darkMode === "dark" ? "#121212" : "background.default" }}>
                 <Grid container spacing={3}>
                     <Grid item xs={12}>
                         <Card
@@ -109,7 +122,7 @@ const UserReport = (id) => {
                             sx={{
                                 borderRadius: 2,
                                 transition: "box-shadow 0.3s ease",
-                                bgcolor: theme.palette.mode === "dark" ? "#1e1e1e" : "background.paper",
+                                bgcolor: darkMode === "dark" ? "#1e1e1e" : "background.paper",
                             }}
                         >
                             <CardContent>
@@ -162,7 +175,8 @@ const UserReport = (id) => {
                                 sx={{
                                     borderRadius: 2,
                                     overflow: "hidden",
-                                    bgcolor: theme.palette.mode === "dark" ? "#1e1e1e" : "background.paper",
+                                    bgcolor: darkMode ? "#1a1a1a" : "#f5f5f5",
+
                                 }}
                                 aria-label="Payment history section"
                             >
@@ -170,34 +184,98 @@ const UserReport = (id) => {
                                     variant="h6"
                                     sx={{
                                         p: 2,
-                                        bgcolor: theme.palette.mode === "dark" ? "#2a2a2a" : "#f5f5f5",
-                                        color: "text.primary"
+                                        bgcolor: darkMode ? "#1a1a1a" : "#f5f5f5",
+                                        color: color
                                     }}
                                 >
                                     Payment History
                                 </Typography>
                                 <TableContainer>
-                                    <Table aria-label="payment history table">
+                                    <Table aria-label="payment history table" sx={{ tableLayout: "fixed" }}>
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell sx={{ color: "text.primary" }}>Date</TableCell>
-                                                <TableCell sx={{ color: "text.primary" }}>Amount</TableCell>
-                                                <TableCell sx={{ color: "text.primary" }}>Payment Method</TableCell>
-                                                <TableCell sx={{ color: "text.primary" }}>Status</TableCell>
+                                                <Grid item xs={12}>
+                                                    <Box
+                                                        sx={{
+                                                            display: 'grid',
+                                                            gridTemplateColumns: 'repeat(4, 1fr)', // 4 columns for all screens
+                                                            gap: 29, // Adjust the gap to a smaller value
+                                                            padding: 2,
+                                                            borderBottom: '1px solid #ddd',
+                                                            // bgcolor: 'background.paper',
+                                                            color: darkMode ? "#faf7f7 !important" : "#0a0a0a !important",
+
+                                                            fontWeight: 'bold',
+                                                            [theme.breakpoints.down('sm')]: {
+                                                                gap: 6, // Smaller gap on small screens
+                                                            },
+                                                            [theme.breakpoints.down('xs')]: {
+                                                                gap: 5, // Same small gap on extra small screens
+                                                            },
+                                                        }}
+
+                                                    >
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{
+                                                                textAlign: 'center',
+                                                                fontWeight: 'bold', // Makes header text bold
+                                                                fontSize: '16px', // Optional: Adjust font size
+                                                            }}
+                                                        >
+                                                            Date
+                                                        </Typography>
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{
+                                                                textAlign: 'center',
+                                                                fontWeight: 'bold', // Makes header text bold
+                                                                fontSize: '16px', // Optional: Adjust font size
+                                                            }}
+                                                        >
+                                                            Amount
+                                                        </Typography>
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{
+                                                                textAlign: 'center',
+                                                                fontWeight: 'bold', // Makes header text bold
+                                                                fontSize: '16px', // Optional: Adjust font size
+                                                            }}
+                                                        >
+                                                            Payment Method
+                                                        </Typography>
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{
+                                                                textAlign: 'center',
+                                                                fontWeight: 'bold', // Makes header text bold
+                                                                fontSize: '16px', // Optional: Adjust font size
+                                                            }}
+                                                        >
+                                                            Status
+                                                        </Typography>
+                                                    </Box>
+                                                </Grid>
+
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
                                             {paymentHistory.map((payment) => (
                                                 <StyledTableRow key={payment.id}>
-                                                    <TableCell sx={{ color: "text.secondary" }}>{payment.date}</TableCell>
-                                                    <TableCell sx={{ color: "text.secondary" }}>RS {payment.amount.toFixed(2)}</TableCell>
-                                                    <TableCell sx={{ color: "text.secondary" }}>
+                                                    <TableCell sx={{ color: color, textAlign: "", padding: "16px" }}>
+                                                        {payment.date}
+                                                    </TableCell>
+                                                    <TableCell sx={{ color: color, textAlign: "", padding: "16px" }}>
+                                                        RS {payment.amount.toFixed(2)}
+                                                    </TableCell>
+                                                    <TableCell sx={{ color: color, textAlign: "", padding: "16px" }}>
                                                         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                                                             <FiCreditCard color={theme.palette.text.primary} />
                                                             {payment.method}
                                                         </Box>
                                                     </TableCell>
-                                                    <TableCell>
+                                                    <TableCell sx={{ textAlign: "", padding: "16px" }}>
                                                         <Chip
                                                             label={payment.status}
                                                             color={getStatusColor(payment.status)}
@@ -209,6 +287,8 @@ const UserReport = (id) => {
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
+
+
                             </Paper>
                         ) : (
                             <Typography variant="h6" sx={{ textAlign: "center", p: 3 }}>
@@ -219,8 +299,8 @@ const UserReport = (id) => {
 
                 </Grid>
             </Box>
-        </DashboardLayout>
+        </DashboardLayout >
     );
 };
 
-export default UserReport;
+export default UserHistory;

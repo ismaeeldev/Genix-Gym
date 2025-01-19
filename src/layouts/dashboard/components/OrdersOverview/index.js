@@ -27,6 +27,8 @@ import TimelineItem from "examples/Timeline/TimelineItem";
 import { useEffect, useState } from "react";
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import data from "../Projects/data";
+import { useNavigate } from "react-router-dom";
+
 
 
 
@@ -35,6 +37,7 @@ function OrdersOverview() {
 
   const jwtToken = Cookies.get("jwtToken");
   const [FeeStatus, setFeeStatus] = useState({});
+  const navigate = useNavigate();
 
 
   const upcomingFee = async () => {
@@ -49,15 +52,8 @@ function OrdersOverview() {
 
       if (!response.ok) {
         const responseData = await response.text();
+        console.log(responseData)
 
-        swal({
-          title: responseData,
-          text: "",
-          icon: "error ",
-          button: "Done",
-        });
-
-        navigate("/authentication/sign-in");
         Cookies.remove("jwtToken");
         return;
       }
@@ -67,13 +63,6 @@ function OrdersOverview() {
 
     } catch (err) {
       console.error("Error:", err);
-      swal({
-        title: "Internal Server Error ",
-        text: "",
-        icon: "error ",
-        button: "Done",
-      });
-      navigate("/authentication/sign-in");
 
     }
   };

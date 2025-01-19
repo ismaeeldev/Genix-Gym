@@ -124,7 +124,7 @@ const UpdateModal = ({ open, onClose, user }) => {
             if (!feeResponse.ok) {
                 throw new Error(feeDataResponse.message || "Failed to update Fee Status.");
             }
-            alert(feeDataResponse.message);
+
 
             // a delay before updating membership
             await new Promise(resolve => setTimeout(resolve, 2000));
@@ -145,9 +145,15 @@ const UpdateModal = ({ open, onClose, user }) => {
                 throw new Error(membershipDataResponse.message || "Failed to update Membership Status.");
             }
 
-            alert(membershipDataResponse.message);
+            // alert(membershipDataResponse.message);
 
             onClose();
+            swal({
+                title: feeDataResponse.message,
+                text: "",
+                icon: "success",
+                button: "Done",
+            });
 
         } catch (err) {
             setError(err.message || "An error occurred during the update.");
@@ -222,6 +228,10 @@ const UpdateModal = ({ open, onClose, user }) => {
                             error={touched.fee && !feeData.fee}
                             helperText={touched.fee && !feeData.fee ? "Fee is required" : ""} // Adjust error message
                             disabled={loading}
+                            sx={{
+                                "& .MuiInputBase-input": { color: "#000" }, // Strictly set input text color to black
+                                "& .MuiFormLabel-root": { color: "rgba(0, 0, 0, 0.6)" }, // Label color
+                            }}
                         />
 
                     </Box>
@@ -233,7 +243,19 @@ const UpdateModal = ({ open, onClose, user }) => {
                             onChange={handleChange("membership_type")}
                             value={feeData.membership_type}
                             displayEmpty
-                            sx={{ width: { xs: "100%", sm: "200px" }, padding: "10px", fontSize: "16px" }}
+                            sx={{
+                                width: { xs: "100%", sm: "200px" }, // Responsive width
+                                padding: "10px", // Padding for the input
+                                fontSize: "16px", // Font size
+                                "& .MuiInputBase-input": {
+                                    color: "#000", // Strictly set input text color to black
+                                    fontSize: "16px", // Font size for the input text
+                                },
+                                "& .MuiFormLabel-root": {
+                                    color: "rgba(0, 0, 0, 0.6)", // Label color
+                                },
+                            }}
+
                         >
                             <MenuItem value="" disabled>Select Membership</MenuItem>
                             <MenuItem value="Daily">Daily</MenuItem>

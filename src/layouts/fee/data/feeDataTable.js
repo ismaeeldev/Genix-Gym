@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import UpdateModal from "components/Modal/FeeModal";
 import { debounce } from "lodash";
-import UserReport from 'components/Report'
+import UserHistory from 'components/UserHistory'
 import { useNavigate } from "react-router-dom";
 
 
@@ -66,6 +66,8 @@ export default function data(searchForm) {
   const [open, setOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
   const [isHistory, setHistory] = useState(false);
+  const [progress, setProgress] = useState(0)
+
   const navigate = useNavigate();
 
 
@@ -108,6 +110,7 @@ export default function data(searchForm) {
         ? `${baseUrl}/search?${queryParams}`
         : `${baseUrl}/all-members?page=${page}&size=${pageSize}`;
 
+      setProgress(20);
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -116,10 +119,11 @@ export default function data(searchForm) {
         },
       });
 
+      setProgress(50);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const data = await response.json();
-
+      setProgress(80);
       // Check if data.members is an array before setting it
       if (Array.isArray(data.members)) {
         setUserData(data.members);
@@ -127,6 +131,7 @@ export default function data(searchForm) {
         setUserData([]); // fallback to an empty array if the response is not valid
       }
       setTotalPage(data.totalPages);
+      setProgress(100);
     } catch (error) {
       console.error("Failed to fetch user data:", error);
       swal({
@@ -312,6 +317,8 @@ export default function data(searchForm) {
     rows: rows, // Dynamically populated rows
     totalPage: totalPage,
     handlePages: handlePage,
+    progress: progress,
+    setProgress: setProgress
 
 
 

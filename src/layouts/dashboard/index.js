@@ -39,6 +39,10 @@ import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import swal from 'sweetalert';
+import LoadingBar from 'react-top-loading-bar'
+
+
 
 
 //
@@ -49,6 +53,9 @@ function Dashboard() {
   // const [cookies] = useCookies(["jwtToken"]);
   // const [message, setMessage] = useState("");
   const jwtToken = Cookies.get("jwtToken");
+  const [progress, setProgress] = useState(0)
+
+
   const [dashboardData, setDashboardData] = useState({ totalMembers: "", currentMembers: "", membersThisMonth: "", totalTrainers: "" })
 
   const hello = async () => {
@@ -81,8 +88,9 @@ function Dashboard() {
   };
 
 
-  const Dashboard = async () => {
+  const DashboardData = async () => {
     try {
+      setProgress(20)
       const response = await fetch('http://localhost:8080/api/member/dashboard/home', {
         method: 'GET',
         headers: {
@@ -91,68 +99,78 @@ function Dashboard() {
         }
       });
 
+      setProgress(50)
       if (!response.ok) {
-        const responseData = await response.text(); // Get the error response as text
+        const responseData = await response.json();
+
         swal({
-          title: responseData,
+          title: "Something went wrong!",
           text: "",
           icon: "error",
           button: "Done",
+        }).then(() => {
+          // This code runs ONLY after the alert is dismissed
+          Cookies.remove("jwtToken");
+          navigate("/authentication/sign-in");
         });
-        navigate("/authentication/sign-in");
-        Cookies.remove("jwtToken");
+
         return;
       }
 
+
       const data = await response.json();
+      setProgress(80)
 
       setDashboardData({ totalMembers: data.totalMembers, currentMembers: data.currentMembers, membersThisMonth: data.membersThisMonth, totalTrainers: data.totalTrainers })
-
+      setProgress(100);
     } catch (err) {
       console.error("Error:", err);
+
+      // Show alert and navigate only after it closes
       swal({
-        title: "Internal Server Error ",
-        text: "",
-        icon: "error",
+        title: "Internal Server Error",
+        text: "Please try again later.",
+        icon: "info",
         button: "Done",
+      }).then(() => {
+        navigate("/authentication/sign-in");
+        Cookies.remove("jwtToken");
       });
-      navigate("/authentication/sign-in");
-
-
     }
   };
 
 
 
-
   useEffect(() => {
-
-    // setTimeout(() => {
-    //   navigate("/Loader")
-
-    // }, 9000);
-    // Retrieve the token from cookies
-    const jwtToken = Cookies.get("jwtToken");
-
-    // Redirect if the token does not exist
     if (!jwtToken) {
       swal({
         title: "Session Expired",
-        text: "",
+        text: "Please Log in again",
         icon: "info",
         button: "Done",
       });
       navigate("/authentication/sign-in");
+    } else {
+      DashboardData(); // Fetch dashboard data
     }
-  }, [navigate]);
+  }, [jwtToken, navigate]);
+
 
   useEffect(() => {
-    hello();
-    Dashboard();
+    // hello();
+    DashboardData();
   }, []);
+
+
+
 
   return (
     <DashboardLayout>
+      <LoadingBar
+        color='#f11946'
+        progress={progress}
+        onLoaderFinished={() => setProgress(0)}
+      />
       <DashboardNavbar />
       <MDBox py={3}>
         <Grid container spacing={3}>

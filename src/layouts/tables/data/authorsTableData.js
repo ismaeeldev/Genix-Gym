@@ -63,6 +63,7 @@ export default function data(searchForm) {
   const [totalPage, setTotalPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
+  const [progress, setProgress] = useState(0)
 
 
   const handlePage = (event, value) => {
@@ -98,6 +99,7 @@ export default function data(searchForm) {
         ? `${baseUrl}/search?${queryParams}`
         : `${baseUrl}/all-members?page=${page}&size=${pageSize}`;
 
+      setProgress(20);
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -106,9 +108,12 @@ export default function data(searchForm) {
         },
       });
 
+      setProgress(50);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
+
       const data = await response.json();
+      setProgress(80);
 
       // Check if data.members is an array before setting it
       if (Array.isArray(data.members)) {
@@ -117,6 +122,8 @@ export default function data(searchForm) {
         setUserData([]); // fallback to an empty array if the response is not valid
       }
       setTotalPage(data.totalPages);
+      setProgress(100);
+
     } catch (error) {
       console.error("Failed to fetch user data:", error);
       swal({
@@ -219,6 +226,7 @@ export default function data(searchForm) {
   // Return the columns and dynamically generated rows
   return {
 
+
     columns: [
       {
         Header: (
@@ -303,6 +311,8 @@ export default function data(searchForm) {
     rows: rows, // Dynamically populated rows
     totalPage: totalPage,
     handlePages: handlePage,
+    progress: progress,
+    setProgress: setProgress,
 
 
 

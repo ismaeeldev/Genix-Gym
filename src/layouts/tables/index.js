@@ -20,10 +20,12 @@ import authorsTableData from "layouts/tables/data/authorsTableData";
 import projectsTableData from "layouts/tables/data/projectsTableData";
 import { Pagination } from "@mui/material";
 import PropTypes from "prop-types"; // Import PropTypes for validation
+import LoadingBar from 'react-top-loading-bar'
 
 
 
 function UserTable() {
+
 
   const [searchForm, setSearchForm] = useState({
     name: "",
@@ -63,12 +65,17 @@ function UserTable() {
 
 
 
-  const { columns, rows, handlePages, totalPage } = authorsTableData(searchForm);
+  const { columns, rows, handlePages, totalPage, progress, setProgress } = authorsTableData(searchForm);
 
 
 
   return (
     <DashboardLayout>
+      <LoadingBar
+        color='#f11946'
+        progress={progress}
+        onLoaderFinished={() => setProgress(0)}
+      />
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
@@ -84,7 +91,7 @@ function UserTable() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  User Data
+                  Member Data
                 </MDTypography>
               </MDBox>
 
