@@ -19,7 +19,13 @@ import Cookies from "js-cookie";
 const StyledModal = styled(Modal)(({ theme }) => ({
     display: "flex",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    "& .MuiBackdrop-root": {  // Override the default black backdrop
+        backgroundColor: "rgba(0, 0, 0, 0.04)", // Light transparent background
+        backdropFilter: "blur(1px)",  // 🔥 Apply blur effect
+        transition: "opacity 0.2s ease-in-out",  // 🚀 Fast smooth transition
+
+    }
 }));
 
 const ModalContent = styled(Box)(({ theme }) => ({

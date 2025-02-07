@@ -2,8 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import Switch from "@mui/material/Switch";
-import Grid from "@mui/material/Grid";
-import MuiLink from "@mui/material/Link";
+import Box from "@mui/material/Box";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
@@ -12,14 +11,14 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-register-2.jpg";
 import Cookies from "js-cookie";
 import swal from 'sweetalert';
-
+import CircularProgress from 'components/CircularProgress';
 
 function Basic() {
   const navigate = useNavigate();
   const [rememberMe, setRememberMe] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
+  const [loading, setLoading] = useState(false);
 
   // Toggle the remember me switch
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
@@ -27,14 +26,14 @@ function Basic() {
   // Handle form submission
   const onChangeLogin = async (event) => {
     event.preventDefault();
+    setLoading(true);
 
-    // Validate inputs
     if (!username || !password) {
+      setLoading(false);
       swal({
-        title: "",
-        text: "Please Enter username or Password",
+        text: "Please enter your username and password",
         icon: "info",
-        button: "Done",
+        button: "OK",
       });
       return;
     }
@@ -42,13 +41,10 @@ function Basic() {
     try {
       const response = await fetch("http://localhost:8080/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
 
-      // Check if the response is OK (status 200)
       if (response.ok) {
         const data = await response.json();
         const token = data.jwtToken;
@@ -56,40 +52,44 @@ function Basic() {
         if (token) {
           const modifiedToken = token.substring(7); // Remove "Bearer " prefix
           Cookies.set("jwtToken", modifiedToken, { expires: 7 });
-          // alert("Login successful! Token saved in the cookie.");
-          swal({
-            title: data.message,
-            text: "",
-            icon: "success",
-            button: "Done",
-          });
+
+          swal({ title: data.message, icon: "success", button: "OK" });
           navigate("/dashboard");
         } else {
-          throw new Error("JWT Token not found in response body.");
+          throw new Error("JWT Token not found in response.");
         }
       } else {
-        // Handle errors based on the API response
         const errorData = await response.json();
-        swal({
-          title: errorData.message,
-          text: "",
-          icon: "warning",
-          button: "Done",
-        });
+        swal({ title: errorData.message, icon: "warning", button: "OK" });
       }
     } catch (error) {
-      console.error("Error during login:", error);
-      swal({
-        title: error.message,
-        text: "",
-        icon: "error",
-        button: "Done",
-      });
+      swal({ title: "Login Failed", text: error.message, icon: "error", button: "OK" });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <BasicLayout image={bgImage}>
+      {loading && (
+        <Box
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(18, 17, 19, 0.29)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <CircularProgress size={80} />
+        </Box>
+      )}
+
       <Card>
         <MDBox
           variant="gradient"
@@ -125,7 +125,6 @@ function Basic() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-
             </MDBox>
             <MDBox display="flex" alignItems="center" ml={-1}>
               <Switch checked={rememberMe} onChange={handleSetRememberMe} />
@@ -154,7 +153,7 @@ function Basic() {
                   fontWeight="medium"
                   textGradient
                 >
-                  Contact to Administration
+                  Contact Administration
                 </MDTypography>
               </MDTypography>
             </MDBox>

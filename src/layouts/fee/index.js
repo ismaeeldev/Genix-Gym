@@ -306,7 +306,5 @@ function FeeTable() {
 
 
 
-
-
 export default FeeTable;
 

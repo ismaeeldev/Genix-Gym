@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import UpdateModal from "components/Modal/FeeModal";
 import { debounce } from "lodash";
-import UserHistory from 'components/UserHistory'
 import { useNavigate } from "react-router-dom";
+import CircularProgress from 'components/CircularProgress'
 
 
 // Define the Author component
@@ -65,8 +65,9 @@ export default function data(searchForm) {
   const [totalPage, setTotalPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
-  const [isHistory, setHistory] = useState(false);
   const [progress, setProgress] = useState(0)
+  const [loading, setLoading] = useState(false);
+
 
   const navigate = useNavigate();
 
@@ -85,7 +86,8 @@ export default function data(searchForm) {
   const handleOpen = (user) => {
     setSelectedUser(user);
     setOpen(true);
-  }
+  };
+
 
 
   const handleClose = () => {
@@ -147,6 +149,7 @@ export default function data(searchForm) {
 
 
 
+
   useEffect(() => {
 
     const debouncedFetchUserData = debounce(() => {
@@ -158,6 +161,7 @@ export default function data(searchForm) {
       debouncedFetchUserData.cancel();
     };
   }, [page, searchForm]);
+
 
 
 
@@ -202,10 +206,7 @@ export default function data(searchForm) {
     action: (
       <MDBox display="flex" justifyContent="space-around">
         <button
-          onClick={() => {
-            console.log("Edit clicked of fee");
-            handleOpen(user);
-          }}
+          onClick={() => handleOpen(user)}
           style={{ background: "transparent", border: "none", cursor: "pointer" }}
         >
           <MDTypography variant="caption" color="text" fontWeight="medium">
@@ -214,25 +215,21 @@ export default function data(searchForm) {
         </button>
         <UpdateModal open={open} onClose={handleClose} user={selectedUser} />
 
-
-
-        &nbsp; &nbsp; &nbsp;
+        &nbsp;&nbsp;&nbsp;
         <button
-          onClick={() => { handleHistory(user) }}
+          onClick={() => handleHistory(user)}
           style={{ background: "transparent", border: "none", cursor: "pointer" }}
         >
           <MDTypography variant="caption" color="text" fontWeight="medium">
             History
           </MDTypography>
         </button>
-
       </MDBox>
     ),
   }));
 
   // Return the columns and dynamically generated rows
   return {
-
     columns: [
       {
         Header: (
@@ -319,9 +316,5 @@ export default function data(searchForm) {
     handlePages: handlePage,
     progress: progress,
     setProgress: setProgress
-
-
-
-
   };
 }

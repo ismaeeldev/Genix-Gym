@@ -26,7 +26,7 @@ import Cookies from "js-cookie";
 import TimelineItem from "examples/Timeline/TimelineItem";
 import { useEffect, useState } from "react";
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import data from "../Projects/data";
+// import data from "../Projects/data";
 import { useNavigate } from "react-router-dom";
 
 

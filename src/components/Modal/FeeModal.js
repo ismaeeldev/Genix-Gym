@@ -11,7 +11,7 @@ import {
     useMediaQuery
 } from "@mui/material";
 import { styled } from "@mui/system";
-import { FiX, FiUser, FiMail, FiPhone } from "react-icons/fi";
+import { FiX, FiUser, FiMail, FiPhone, FiCreditCard } from "react-icons/fi";
 import PropTypes from "prop-types";
 import Cookies from "js-cookie";
 import Select from "@mui/material/Select";
@@ -22,8 +22,15 @@ import MenuItem from "@mui/material/MenuItem";
 const StyledModal = styled(Modal)(({ theme }) => ({
     display: "flex",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    "& .MuiBackdrop-root": {  // Override the default black backdrop
+        backgroundColor: "rgba(0, 0, 0, 0.04)", // Light transparent background
+        backdropFilter: "blur(1px)",  // 🔥 Apply blur effect
+        transition: "opacity 0.2s ease-in-out",  // 🚀 Fast smooth transition
+
+    }
 }));
+
 
 const ModalContent = styled(Box)(({ theme }) => ({
     backgroundColor: "#ffffff",
@@ -52,7 +59,7 @@ const UpdateModal = ({ open, onClose, user }) => {
     const [error, setError] = useState("");
     const [touched, setTouched] = useState({});
     const isMobile = useMediaQuery("(max-width:600px)");
-    const [feeData, setFeeData] = useState({ name: "", fee: "", membership_type: "" });
+    const [feeData, setFeeData] = useState({ name: "", fee: "", membership_type: "", paymentMethod: "" });
 
     useEffect(() => {
         if (user) {
@@ -60,6 +67,7 @@ const UpdateModal = ({ open, onClose, user }) => {
                 name: user.name || "",
                 fee: "",
                 membership_type: user.membership_type || "",
+                paymentMethod: user.paymentMethod || "",
             });
         }
     }, [user]);
@@ -92,19 +100,19 @@ const UpdateModal = ({ open, onClose, user }) => {
         }));
     };
 
-    const validateForm = () => {
-        const { name, fee } = feeData;
-        const errors = {};
+    // const validateForm = () => {
+    //     const { name, fee } = feeData;
+    //     const errors = {};
 
-        if (!name) errors.name = "Name is required";
-        if (!fee) errors.fee = "Fee is required";
+    //     if (!name) errors.name = "Name is required";
+    //     if (!fee) errors.fee = "Fee is required";
 
-        if (Object.keys(errors).length) {
-            setError(errors);
-            return false;
-        }
-        return true;
-    };
+    //     if (Object.keys(errors).length) {
+    //         setError(errors);
+    //         return false;
+    //     }
+    //     return true;
+    // };
 
     const handleSubmit = async () => {
         setError("");
@@ -233,6 +241,33 @@ const UpdateModal = ({ open, onClose, user }) => {
                                 "& .MuiFormLabel-root": { color: "rgba(0, 0, 0, 0.6)" }, // Label color
                             }}
                         />
+
+                    </Box>
+                    <Box sx={{ display: "flex", alignItems: "flex-end", mb: 2 }}>
+                        <FiCreditCard style={{ marginRight: "8px" }} />
+                        <Select
+                            onChange={handleChange("paymentMethod")}
+                            value={feeData.paymentMethod}
+                            displayEmpty
+                            sx={{
+                                width: { xs: "100%", sm: "200px" }, // Responsive width
+                                padding: "10px", // Padding for the input
+                                fontSize: "16px", // Font size
+                                "& .MuiInputBase-input": {
+                                    color: "#000", // Strictly set input text color to black
+                                    fontSize: "16px", // Font size for the input text
+                                },
+                                "& .MuiFormLabel-root": {
+                                    color: "rgba(0, 0, 0, 0.6)", // Label color
+                                },
+                            }}
+
+                        >
+                            <MenuItem value="" disabled>Payment Method</MenuItem>
+                            <MenuItem value="cash">Cash</MenuItem>
+                            <MenuItem value="check">Check</MenuItem>
+                            <MenuItem value="online">Online</MenuItem>
+                        </Select>
 
                     </Box>
 

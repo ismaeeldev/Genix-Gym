@@ -54,7 +54,7 @@ const UserHistory = (id) => {
 
     useEffect(() => {
         // Dynamically update color based on darkMode state 1f1d1d
-        const newColor = darkMode ? "#f7f5f5 !important" : "#1f1d1d !important";
+        const newColor = darkMode ? "#f7f5f5" : "#1f1d1d";
         setColor(newColor);
     }, [darkMode]);
 
@@ -68,7 +68,6 @@ const UserHistory = (id) => {
             phone: user?.phone,
             membership_type: user?.membership_type,
         });
-
 
         const fetchData = async () => {
             try {
@@ -122,41 +121,39 @@ const UserHistory = (id) => {
                             sx={{
                                 borderRadius: 2,
                                 transition: "box-shadow 0.3s ease",
-                                bgcolor: darkMode === "dark" ? "#1e1e1e" : "background.paper",
+                                bgcolor: darkMode ? "#1a1a1a" : "#f5f5f5",
                             }}
                         >
                             <CardContent>
                                 <Grid container spacing={2} alignItems="center">
                                     <Grid item>
-                                        <Avatar
-                                            src={`https://${userData.profileImage}`}
-                                            alt={userData.name}
-                                            sx={{ width: 80, height: 80 }}
-                                        />
+                                        <Avatar src={userData.profileImage} alt={userData.name} sx={{ width: 80, height: 80 }} />
+
                                     </Grid>
                                     <Grid item xs={12} sm>
-                                        <Typography variant="h5" gutterBottom color="text.primary">
+                                        <Typography variant="h5" gutterBottom color="text.primary"
+                                            sx={{ color: color }}>
                                             {userData.name}
                                         </Typography>
                                         <Grid container spacing={2}>
                                             <Grid item xs={12} sm={6} md={3}>
                                                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                                    <FiMail color={theme.palette.text.primary} />
-                                                    <Typography variant="body2" color="text.secondary">{userData.email}</Typography>
+                                                    <FiMail color={color} />
+                                                    <Typography variant="body2" sx={{ color: color }}>{userData.email}</Typography>
                                                 </Box>
                                             </Grid>
                                             <Grid item xs={12} sm={6} md={3}>
                                                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                                    <FiPhone color={theme.palette.text.primary} />
-                                                    <Typography variant="body2" color="text.secondary">{userData.phone}</Typography>
+                                                    <FiPhone color={color} />
+                                                    <Typography variant="body2" sx={{ color: color }}>{userData.phone}</Typography>
                                                 </Box>
                                             </Grid>
                                             <Grid item xs={12} sm={6} md={3}>
                                                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                                    <FiUser color={theme.palette.text.primary} />
+                                                    <FiUser color={color} />
                                                     <Chip
                                                         label={userData.membership_type}
-                                                        color="primary"
+                                                        sx={{ color: color }}
                                                         size="small"
                                                     />
                                                 </Box>
@@ -271,7 +268,7 @@ const UserHistory = (id) => {
                                                     </TableCell>
                                                     <TableCell sx={{ color: color, textAlign: "", padding: "16px" }}>
                                                         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                                            <FiCreditCard color={theme.palette.text.primary} />
+                                                            <FiCreditCard color={color} />
                                                             {payment.method}
                                                         </Box>
                                                     </TableCell>

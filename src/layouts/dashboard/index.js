@@ -1,167 +1,90 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
+import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import swal from "sweetalert";
+import LoadingBar from "react-top-loading-bar";
 
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// @mui material components
 import Grid from "@mui/material/Grid";
-
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-
-// Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
 import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
-
-// Data
-import reportsBarChartData from "layouts/dashboard/data/reportsBarChartData";
-import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
-
-// Dashboard components
-import Projects from "layouts/dashboard/components/Projects";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 
-import { useEffect, useState } from "react";
-import { useCookies } from "react-cookie";
-import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
-import swal from 'sweetalert';
-import LoadingBar from 'react-top-loading-bar'
-
-
-
-
-//
+import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 
 function Dashboard() {
   const navigate = useNavigate();
-  const { sales, tasks } = reportsLineChartData;
-  // const [cookies] = useCookies(["jwtToken"]);
-  // const [message, setMessage] = useState("");
+  const { sales } = reportsLineChartData;
   const jwtToken = Cookies.get("jwtToken");
-  const [progress, setProgress] = useState(0)
 
+  const [progress, setProgress] = useState(0);
+  const [dashboardData, setDashboardData] = useState({
+    totalMembers: 0,
+    currentMembers: 0,
+    membersThisMonth: 0,
+    totalTrainers: 0,
+  });
 
-  const [dashboardData, setDashboardData] = useState({ totalMembers: "", currentMembers: "", membersThisMonth: "", totalTrainers: "" })
-
-  const hello = async () => {
+  const fetchDashboardData = useCallback(async () => {
+    if (!jwtToken) return;
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/welcome', {
-        method: 'GET',
+      setProgress(20);
+      const response = await fetch("http://localhost:8080/api/member/dashboard/home", {
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${jwtToken}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${jwtToken}`,
+          "Content-Type": "application/json",
+        },
       });
 
-      // Check if the response is OK (status 200-299)
+      setProgress(50);
       if (!response.ok) {
-        const responseData = await response.text(); // Get the error response as text
-        alert("Error: " + responseData);
-        navigate("/authentication/sign-in");
-        Cookies.remove("jwtToken");
-
-        return;
-      }
-
-      // Parse and log the successful response as JSON
-      const json = await response.text();
-    } catch (err) {
-      console.error("Error:", err);
-      alert("Error: " + err.message);
-    }
-  };
-
-
-  const DashboardData = async () => {
-    try {
-      setProgress(20)
-      const response = await fetch('http://localhost:8080/api/member/dashboard/home', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${jwtToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      setProgress(50)
-      if (!response.ok) {
-        const responseData = await response.json();
-
         swal({
-          title: "Something went wrong!",
-          text: "",
-          icon: "error",
+          title: "Session Expired",
+          text: "Please log in again.",
+          icon: "info",
           button: "Done",
         }).then(() => {
-          // This code runs ONLY after the alert is dismissed
           Cookies.remove("jwtToken");
           navigate("/authentication/sign-in");
         });
-
         return;
       }
 
-
       const data = await response.json();
-      setProgress(80)
-
-      setDashboardData({ totalMembers: data.totalMembers, currentMembers: data.currentMembers, membersThisMonth: data.membersThisMonth, totalTrainers: data.totalTrainers })
+      setProgress(80);
+      setDashboardData(data);
       setProgress(100);
     } catch (err) {
       console.error("Error:", err);
-
-      // Show alert and navigate only after it closes
       swal({
         title: "Internal Server Error",
         text: "Please try again later.",
-        icon: "info",
+        icon: "error",
         button: "Done",
       }).then(() => {
-        navigate("/authentication/sign-in");
         Cookies.remove("jwtToken");
+        navigate("/authentication/sign-in");
       });
     }
-  };
-
-
+  }, [jwtToken, navigate]);
 
   useEffect(() => {
     if (!jwtToken) {
       swal({
         title: "Session Expired",
-        text: "Please Log in again",
+        text: "Please log in again.",
         icon: "info",
         button: "Done",
-      });
-      navigate("/authentication/sign-in");
+      }).then(() => navigate("/authentication/sign-in"));
     } else {
-      DashboardData(); // Fetch dashboard data
+      fetchDashboardData();
     }
-  }, [jwtToken, navigate]);
-
-
-  useEffect(() => {
-    // hello();
-    DashboardData();
-  }, []);
-
-
+  }, [jwtToken, fetchDashboardData, navigate]);
 
 
   return (
