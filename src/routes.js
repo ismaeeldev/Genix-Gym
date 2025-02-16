@@ -12,10 +12,12 @@ const UserTable = lazy(() => import("layouts/tables"));
 const FeeTable = lazy(() => import("layouts/fee"));
 const UserHistory = lazy(() => import("components/UserHistory"));
 const Loader = lazy(() => import("components/Loader"));
+const MemberProfile = lazy(() => import("layouts/Member"));
+const UserProfile = lazy(() => import("layouts/User"));
 
 const LoaderFallback = () => (
   <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100vw", height: "100vh" }}>
-    <CircularProgress size={80} />
+    <CircularProgress size={60} />
   </Box>
 );
 
@@ -104,6 +106,25 @@ const routes = [
     component: (
       <Suspense fallback={<LoaderFallback />}>
         <Loader />
+      </Suspense>
+    ),
+  },
+  {
+    key: "memberProfile",
+    route: "/memberProfile",
+    component: (
+      <Suspense fallback={<LoaderFallback />}>
+        <MemberProfile />
+      </Suspense>
+    ),
+  },
+  {
+    key: "userProfile",
+    route: "/userProfile",
+    name: "userProfile",
+    component: (
+      <Suspense fallback={<LoaderFallback />}>
+        <UserProfile />
       </Suspense>
     ),
   },

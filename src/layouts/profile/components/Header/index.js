@@ -40,7 +40,6 @@ function ContactForm() {
   const handleSubmit = (event) => {
     event.preventDefault();
     // Handle the form submission logic here (e.g., send data to an API or show a success message)
-    console.log(formData);
   };
 
   return (

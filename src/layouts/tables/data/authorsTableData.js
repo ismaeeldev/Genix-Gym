@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import UpdateModal from "components/Modal/UserModal";
 import { debounce } from "lodash";
+import { Navigate, useNavigate } from "react-router-dom";
 
 
 // Define the Author component
@@ -64,6 +65,7 @@ export default function data(searchForm) {
   const [open, setOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
   const [progress, setProgress] = useState(0)
+  const navigate = useNavigate();
 
 
   const handlePage = (event, value) => {
@@ -195,7 +197,6 @@ export default function data(searchForm) {
       <MDBox display="flex" justifyContent="space-around">
         <button
           onClick={() => {
-            console.log("Edit clicked");
             handleOpen(user);
           }}
           style={{ background: "transparent", border: "none", cursor: "pointer" }}
@@ -211,7 +212,7 @@ export default function data(searchForm) {
         &nbsp; &nbsp; &nbsp;
         <button
           onClick={() => {
-
+            navigate('/memberProfile', { state: { user } });
           }}
           style={{ background: "transparent", border: "none", cursor: "pointer" }}
         >

@@ -3,6 +3,7 @@ import { Box, CircularProgress, Typography } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate } from "react-router-dom"; // Import navigate for redirection
 import Cookies from "js-cookie";
+import bg from '../../assets/images/new1.jpg'
 
 const LoadingContainer = styled(Box)(({ theme }) => ({
     width: "100vw",
@@ -10,7 +11,7 @@ const LoadingContainer = styled(Box)(({ theme }) => ({
     position: "absolute", // Absolute positioning to cover entire screen
     top: 0,
     left: 0,
-    background: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3")`,
+    background: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${bg})`,
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
@@ -73,10 +74,8 @@ const LoadingScreen = () => {
         const navigationTimer = setTimeout(() => {
             if (jwtToken) {
                 navigate("/dashboard", { replace: true });
-                console.log("Dashboard");
             } else {
                 navigate("/authentication/sign-in", { replace: true });
-                console.log("Sign-in");
             }
         }, totalDuration);
 

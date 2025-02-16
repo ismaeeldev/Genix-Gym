@@ -82,7 +82,6 @@ function Register() {
             }
 
             // Display the success message from the API
-            console.log("Registration successful:", data);
             swal({
                 title: data.message,
                 text: "",

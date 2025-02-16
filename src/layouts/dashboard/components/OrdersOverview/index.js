@@ -52,7 +52,6 @@ function OrdersOverview() {
 
       if (!response.ok) {
         const responseData = await response.text();
-        console.log(responseData)
 
         Cookies.remove("jwtToken");
         return;

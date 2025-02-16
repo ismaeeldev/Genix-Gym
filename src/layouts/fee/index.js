@@ -4,12 +4,8 @@ import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDInput from "components/MDInput";
 import MDTypography from "components/MDTypography";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Radio from "@mui/material/Radio";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import Button from "@mui/material/Button";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import DataTable from "examples/Tables/DataTable";
@@ -18,7 +14,6 @@ import MDButton from "components/MDButton";
 // Data
 import feeDataTable from "layouts/fee/data/feeDataTable";
 import { Pagination } from "@mui/material";
-import PropTypes from "prop-types"; // Import PropTypes for validation
 import LoadingBar from 'react-top-loading-bar'
 
 
@@ -36,7 +31,6 @@ function FeeTable() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(searchForm); // Debugging: Display the form data
   };
 
   const handleInputChange = (event) => {
@@ -74,6 +68,7 @@ function FeeTable() {
         progress={progress}
         onLoaderFinished={() => setProgress(0)}
       />
+      <DashboardNavbar />
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>

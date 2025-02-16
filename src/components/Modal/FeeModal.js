@@ -16,40 +16,40 @@ import PropTypes from "prop-types";
 import Cookies from "js-cookie";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import { useMaterialUIController } from "../../context"; // Adjust path if needed
 
 
 
-const StyledModal = styled(Modal)(({ theme }) => ({
+
+const StyledModal = styled(Modal)(({ theme, darkMode }) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    "& .MuiBackdrop-root": {  // Override the default black backdrop
-        backgroundColor: "rgba(0, 0, 0, 0.04)", // Light transparent background
-        backdropFilter: "blur(1px)",  // 🔥 Apply blur effect
-        transition: "opacity 0.2s ease-in-out",  // 🚀 Fast smooth transition
-
+    "& .MuiBackdrop-root": {
+        backgroundColor: darkMode
+            ? "rgba(0, 0, 0, 0.8)" // Darker backdrop in dark mode
+            : "rgba(0, 0, 0, 0.04)",
+        backdropFilter: "blur(2px)",
+        transition: "opacity 0.2s ease-in-out"
     }
 }));
 
 
-const ModalContent = styled(Box)(({ theme }) => ({
-    backgroundColor: "#ffffff",
+const ModalContent = styled(Box)(({ theme, darkMode }) => ({
+    backgroundColor: darkMode ? "#111622" : "#ffffff", // Dark mode background
+    color: darkMode ? "#ffffff" : "#000000", // Adjust text color
     borderRadius: "8px",
     padding: "24px",
     position: "relative",
     width: "90%",
     maxWidth: "500px",
-    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+    boxShadow: darkMode
+        ? "0 4px 20px rgba(255, 255, 255, 0.1)"
+        : "0 4px 20px rgba(0, 0, 0, 0.1)", // Adjust shadow color
     animation: "fadeIn 0.3s ease-in-out",
     "@keyframes fadeIn": {
-        "0%": {
-            opacity: 0,
-            transform: "scale(0.9)"
-        },
-        "100%": {
-            opacity: 1,
-            transform: "scale(1)"
-        }
+        "0%": { opacity: 0, transform: "scale(0.9)" },
+        "100%": { opacity: 1, transform: "scale(1)" }
     }
 }));
 
@@ -58,6 +58,9 @@ const UpdateModal = ({ open, onClose, user }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [touched, setTouched] = useState({});
+    const [controller] = useMaterialUIController();
+    const { darkMode } = controller;
+
     const isMobile = useMediaQuery("(max-width:600px)");
     const [feeData, setFeeData] = useState({ name: "", fee: "", membership_type: "", paymentMethod: "" });
 
@@ -185,31 +188,37 @@ const UpdateModal = ({ open, onClose, user }) => {
             aria-labelledby="update-profile-modal"
             aria-describedby="modal-to-update-user-profile"
             disableEscapeKeyDown={loading}
+            darkMode={darkMode}
+
         >
-            <ModalContent sx={{ padding: isMobile ? "16px" : "24px" }}>
+            <ModalContent darkMode={darkMode}
+                sx={{ padding: isMobile ? "16px" : "24px" }}>
                 <IconButton
                     aria-label="close"
                     onClick={() => !loading && onClose()}
                     sx={{
                         position: "absolute",
                         right: 8,
-                        top: 8
+                        top: 8,
+                        color: darkMode ? "#ffffff" : "#000000" // Ensure button color adapts
+
                     }}
                 >
                     <FiX />
                 </IconButton>
 
-                <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3, color: "white !important" }}>
+                <Typography darkMode={darkMode}
+                    variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
                     Update Profile
                 </Typography>
 
                 {error && (
-                    <Alert severity="error" sx={{ mb: 2 }}>
+                    <Alert darkMode={darkMode} severity="error" sx={{ mb: 2 }}>
                         {error}
                     </Alert>
                 )}
 
-                <Box component="form" noValidate>
+                <Box darkMode={darkMode} component="form" noValidate>
                     <Box sx={{ display: "flex", alignItems: "flex-end", mb: 2 }}>
                         <FiUser style={{ marginRight: "8px" }} />
                         <TextField
@@ -221,6 +230,32 @@ const UpdateModal = ({ open, onClose, user }) => {
                             error={touched.name && !feeData.name}
                             helperText={touched.name && !feeData.name ? "Name is required" : ""}
                             disabled={true}
+                            InputLabelProps={{
+                                sx: {
+                                    color: darkMode ? "#ffffff !important" : "#000000 !important", // Strict label color
+                                    "&.Mui-focused": { color: darkMode ? "#ffffff !important" : "#1976d2 !important" }
+                                }
+                            }}
+
+                            InputProps={{
+                                sx: {
+                                    color: darkMode ? "#ffffff !important" : "#000000 !important", // Strict text color
+                                    background: darkMode ? "#484848 " : "#ffffff !important", // Remove background strictly
+                                    "&.Mui-disabled": {
+                                        "-webkit-text-fill-color": darkMode ? "#ffffff !important" : "#000000 !important", // Ensure text color stays in disabled mode
+                                        opacity: 1, // Prevent text from fading
+                                    },
+                                    "& .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#ffffff !important" : "#000000 !important" // Strict border color
+                                    },
+                                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#ffffff !important" : "#1976d2 !important" // Border on hover
+                                    },
+                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#ffffff !important" : "#1976d2 !important" // Border when focused
+                                    }
+                                }
+                            }}
                         />
                     </Box>
 
@@ -235,10 +270,26 @@ const UpdateModal = ({ open, onClose, user }) => {
                             onBlur={handleBlur("fee")}
                             error={touched.fee && !feeData.fee}
                             helperText={touched.fee && !feeData.fee ? "Fee is required" : ""} // Adjust error message
-                            disabled={loading}
-                            sx={{
-                                "& .MuiInputBase-input": { color: "#000" }, // Strictly set input text color to black
-                                "& .MuiFormLabel-root": { color: "rgba(0, 0, 0, 0.6)" }, // Label color
+                            // disabled={loading}
+                            InputLabelProps={{
+                                sx: {
+                                    color: darkMode ? "#ffffff" : "#000000",  // Change label color
+                                    "&.Mui-focused": { color: darkMode ? "#ffffff" : "#1976d2" } // Change color when focused
+                                }
+                            }}
+                            InputProps={{
+                                sx: {
+                                    color: darkMode ? "#ffffff" : "#000000",  // Change input text color
+                                    "& .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#ffffff" : "#000000"  // Change border color
+                                    },
+                                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#bbbbbb" : "#1976d2" // Change border on hover
+                                    },
+                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#ffffff" : "#1976d2" // Change border when focused
+                                    }
+                                }
                             }}
                         />
 
@@ -254,11 +305,11 @@ const UpdateModal = ({ open, onClose, user }) => {
                                 padding: "10px", // Padding for the input
                                 fontSize: "16px", // Font size
                                 "& .MuiInputBase-input": {
-                                    color: "#000", // Strictly set input text color to black
+                                    color: darkMode ? "#ffffff" : "#000000",
                                     fontSize: "16px", // Font size for the input text
                                 },
                                 "& .MuiFormLabel-root": {
-                                    color: "rgba(0, 0, 0, 0.6)", // Label color
+                                    color: darkMode ? "#ffffff" : "#000000",
                                 },
                             }}
 
@@ -283,11 +334,11 @@ const UpdateModal = ({ open, onClose, user }) => {
                                 padding: "10px", // Padding for the input
                                 fontSize: "16px", // Font size
                                 "& .MuiInputBase-input": {
-                                    color: "#000", // Strictly set input text color to black
+                                    color: darkMode ? "#ffffff" : "#000000",
                                     fontSize: "16px", // Font size for the input text
                                 },
                                 "& .MuiFormLabel-root": {
-                                    color: "rgba(0, 0, 0, 0.6)", // Label color
+                                    color: darkMode ? "#ffffff" : "#000000",
                                 },
                             }}
 

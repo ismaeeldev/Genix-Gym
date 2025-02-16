@@ -14,38 +14,39 @@ import { styled } from "@mui/system";
 import { FiX, FiUser, FiMail, FiPhone } from "react-icons/fi";
 import PropTypes from "prop-types";
 import Cookies from "js-cookie";
+import { useMaterialUIController } from "../../context"; // Adjust path if needed
 
 
-const StyledModal = styled(Modal)(({ theme }) => ({
+
+const StyledModal = styled(Modal)(({ theme, darkMode }) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    "& .MuiBackdrop-root": {  // Override the default black backdrop
-        backgroundColor: "rgba(0, 0, 0, 0.04)", // Light transparent background
-        backdropFilter: "blur(1px)",  // 🔥 Apply blur effect
-        transition: "opacity 0.2s ease-in-out",  // 🚀 Fast smooth transition
-
+    "& .MuiBackdrop-root": {
+        backgroundColor: darkMode
+            ? "rgba(0, 0, 0, 0.8)" // Darker backdrop in dark mode
+            : "rgba(0, 0, 0, 0.04)",
+        backdropFilter: "blur(2px)",
+        transition: "opacity 0.2s ease-in-out"
     }
 }));
 
-const ModalContent = styled(Box)(({ theme }) => ({
-    backgroundColor: "#ffffff",
+
+const ModalContent = styled(Box)(({ theme, darkMode }) => ({
+    backgroundColor: darkMode ? "#111622" : "#ffffff", // Dark mode background
+    color: darkMode ? "#ffffff" : "#000000", // Adjust text color
     borderRadius: "8px",
     padding: "24px",
     position: "relative",
     width: "90%",
     maxWidth: "500px",
-    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+    boxShadow: darkMode
+        ? "0 4px 20px rgba(255, 255, 255, 0.1)"
+        : "0 4px 20px rgba(0, 0, 0, 0.1)", // Adjust shadow color
     animation: "fadeIn 0.3s ease-in-out",
     "@keyframes fadeIn": {
-        "0%": {
-            opacity: 0,
-            transform: "scale(0.9)"
-        },
-        "100%": {
-            opacity: 1,
-            transform: "scale(1)"
-        }
+        "0%": { opacity: 0, transform: "scale(0.9)" },
+        "100%": { opacity: 1, transform: "scale(1)" }
     }
 }));
 
@@ -56,6 +57,9 @@ const UpdateModal = ({ open, onClose, user }) => {
     const [touched, setTouched] = useState({});
     const isMobile = useMediaQuery("(max-width:600px)");
     const safeUser = user || {}; // Ensure user is at least an empty object
+    const [controller] = useMaterialUIController();
+    const { darkMode } = controller;
+
 
     const [formData, setFormData] = useState({
         name: safeUser.name || "",
@@ -179,32 +183,35 @@ const UpdateModal = ({ open, onClose, user }) => {
             aria-labelledby="update-profile-modal"
             aria-describedby="modal-to-update-user-profile"
             disableEscapeKeyDown={loading}
+            darkMode={darkMode}
         >
-            <ModalContent sx={{ padding: isMobile ? "16px" : "24px" }}>
+            <ModalContent darkMode={darkMode} sx={{ padding: isMobile ? "16px" : "24px" }}>
                 <IconButton
                     aria-label="close"
                     onClick={() => !loading && onClose()}
                     sx={{
                         position: "absolute",
                         right: 8,
-                        top: 8
+                        top: 8,
+                        color: darkMode ? "#ffffff" : "#000000" // Ensure button color adapts
+
                     }}
                 >
                     <FiX />
                 </IconButton>
 
-                <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3, color: "white !important" }}>
+                <Typography darkMode={darkMode} variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
                     Update Profile
                 </Typography>
 
                 {error && (
-                    <Alert severity="error" sx={{ mb: 2 }}>
+                    <Alert darkMode={darkMode} severity="error" sx={{ mb: 2 }}>
                         {error}
                     </Alert>
                 )}
 
-                <Box component="form" noValidate>
-                    <Box sx={{ display: "flex", alignItems: "flex-end", mb: 2 }}>
+                <Box darkMode={darkMode} component="form" noValidate>
+                    <Box darkMode={darkMode} sx={{ display: "flex", alignItems: "flex-end", mb: 2 }}>
                         <FiUser style={{ marginRight: "8px" }} />
                         <TextField
                             fullWidth
@@ -214,13 +221,42 @@ const UpdateModal = ({ open, onClose, user }) => {
                             onBlur={handleBlur("name")}
                             error={touched.name && !formData.name}
                             helperText={touched.name && !formData.name ? "Name is required" : ""}
-                            disabled={true}
+                            disabled={true} // Disable the field
+
+                            InputLabelProps={{
+                                sx: {
+                                    color: darkMode ? "#ffffff !important" : "#000000 !important", // Strict label color
+                                    "&.Mui-focused": { color: darkMode ? "#ffffff !important" : "#1976d2 !important" }
+                                }
+                            }}
+
+                            InputProps={{
+                                sx: {
+                                    color: darkMode ? "#ffffff !important" : "#000000 !important", // Strict text color
+                                    background: darkMode ? "#484848 " : "#ffffff !important", // Remove background strictly
+                                    "&.Mui-disabled": {
+                                        "-webkit-text-fill-color": darkMode ? "#ffffff !important" : "#000000 !important", // Ensure text color stays in disabled mode
+                                        opacity: 1, // Prevent text from fading
+                                    },
+                                    "& .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#ffffff !important" : "#000000 !important" // Strict border color
+                                    },
+                                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#ffffff !important" : "#1976d2 !important" // Border on hover
+                                    },
+                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#ffffff !important" : "#1976d2 !important" // Border when focused
+                                    }
+                                }
+                            }}
                         />
+
                     </Box>
 
                     <Box sx={{ display: "flex", alignItems: "flex-end", mb: 2 }}>
                         <FiMail style={{ marginRight: "8px" }} />
                         <TextField
+                            darkMode={darkMode}
                             fullWidth
                             label="Email"
                             type="email"
@@ -229,10 +265,26 @@ const UpdateModal = ({ open, onClose, user }) => {
                             onBlur={handleBlur("email")}
                             error={touched.email && (!formData.email || !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email))}
                             helperText={touched.email && !formData.email ? "Email is required" : ""}
-                            disabled={loading}
-                            sx={{
-                                "& .MuiInputBase-input": { color: "#000" }, // Strictly set input text color to black
-                                "& .MuiFormLabel-root": { color: "rgba(0, 0, 0, 0.6)" }, // Label color
+                            // disabled={loading}
+                            InputLabelProps={{
+                                sx: {
+                                    color: darkMode ? "#ffffff" : "#000000",  // Change label color
+                                    "&.Mui-focused": { color: darkMode ? "#ffffff" : "#1976d2" } // Change color when focused
+                                }
+                            }}
+                            InputProps={{
+                                sx: {
+                                    color: darkMode ? "#ffffff" : "#000000",  // Change input text color
+                                    "& .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#ffffff" : "#000000"  // Change border color
+                                    },
+                                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#bbbbbb" : "#1976d2" // Change border on hover
+                                    },
+                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#ffffff" : "#1976d2" // Change border when focused
+                                    }
+                                }
                             }}
                         />
                     </Box>
@@ -247,10 +299,26 @@ const UpdateModal = ({ open, onClose, user }) => {
                             onBlur={handleBlur("phone")}
                             error={touched.phone && !formData.phone}
                             helperText={touched.phone && !formData.phone ? "Phone number is required" : ""}
-                            disabled={loading}
-                            sx={{
-                                "& .MuiInputBase-input": { color: "#000" }, // Strictly set input text color to black
-                                "& .MuiFormLabel-root": { color: "rgba(0, 0, 0, 0.6)" }, // Label color
+                            // disabled={loading}
+                            InputLabelProps={{
+                                sx: {
+                                    color: darkMode ? "#ffffff" : "#000000",  // Change label color
+                                    "&.Mui-focused": { color: darkMode ? "#ffffff" : "#1976d2" } // Change color when focused
+                                }
+                            }}
+                            InputProps={{
+                                sx: {
+                                    color: darkMode ? "#ffffff" : "#000000",  // Change input text color
+                                    "& .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#ffffff" : "#000000"  // Change border color
+                                    },
+                                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#bbbbbb" : "#1976d2" // Change border on hover
+                                    },
+                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#ffffff" : "#1976d2" // Change border when focused
+                                    }
+                                }
                             }}
                         />
                     </Box>
@@ -265,10 +333,26 @@ const UpdateModal = ({ open, onClose, user }) => {
                             onBlur={handleBlur("address")}
                             error={touched.address && !formData.address}
                             helperText={touched.address && !formData.address ? "Address is required" : ""}
-                            disabled={loading}
-                            sx={{
-                                "& .MuiInputBase-input": { color: "#000" }, // Strictly set input text color to black
-                                "& .MuiFormLabel-root": { color: "rgba(0, 0, 0, 0.6)" }, // Label color
+                            // disabled={loading}
+                            InputLabelProps={{
+                                sx: {
+                                    color: darkMode ? "#ffffff" : "#000000",  // Change label color
+                                    "&.Mui-focused": { color: darkMode ? "#ffffff" : "#1976d2" } // Change color when focused
+                                }
+                            }}
+                            InputProps={{
+                                sx: {
+                                    color: darkMode ? "#ffffff" : "#000000",  // Change input text color
+                                    "& .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#ffffff" : "#000000"  // Change border color
+                                    },
+                                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#bbbbbb" : "#1976d2" // Change border on hover
+                                    },
+                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#ffffff" : "#1976d2" // Change border when focused
+                                    }
+                                }
                             }}
                         />
                     </Box>
@@ -283,10 +367,26 @@ const UpdateModal = ({ open, onClose, user }) => {
                             onBlur={handleBlur("blood_group")}
                             error={touched.blood_group && !formData.blood_group}
                             helperText={touched.blood_group && !formData.blood_group ? "Blood Group  is required" : ""}
-                            disabled={loading}
-                            sx={{
-                                "& .MuiInputBase-input": { color: "#000" }, // Strictly set input text color to black
-                                "& .MuiFormLabel-root": { color: "rgba(0, 0, 0, 0.6)" }, // Label color
+                            // disabled={loading}
+                            InputLabelProps={{
+                                sx: {
+                                    color: darkMode ? "#ffffff" : "#000000",  // Change label color
+                                    "&.Mui-focused": { color: darkMode ? "#ffffff" : "#1976d2" } // Change color when focused
+                                }
+                            }}
+                            InputProps={{
+                                sx: {
+                                    color: darkMode ? "#ffffff" : "#000000",  // Change input text color
+                                    "& .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#ffffff" : "#000000"  // Change border color
+                                    },
+                                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#bbbbbb" : "#1976d2" // Change border on hover
+                                    },
+                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode ? "#ffffff" : "#1976d2" // Change border when focused
+                                    }
+                                }
                             }}
                         />
                     </Box>
